@@ -46,6 +46,7 @@ function validateChampion() {
 	var championInputName = championNameInput.value.toLowerCase()
 	if (!championInputName) {
 		championIdSpan.innerHTML = ""
+		championId = undefined
 		return
 	}
 	
@@ -87,6 +88,8 @@ function validateUsername() {
 	if (!usernameInput.value) {
 		socket.off("summoner") // makes sure delayed responses don't overwrite empty innerHTML
 		userIdSpan.innerHTML = ""
+		userId = undefined
+		username = undefined
 		return
 	}
 	userIdSpan.innerHTML = "⏳" // hourglass symbol for loading
