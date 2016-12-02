@@ -258,8 +258,8 @@ var requestQueue = new Queue()
 io.on("connection", (socket) => {
 	console.log("\nNEW CONNECTION!\n")
 	
-	socket.emit("items", items)
-	socket.emit("champions", champions)
+	socket.emit("items", items, () => { console.log("player received items"))
+	socket.emit("champions", champions, () => { console.log("player received champions") })
 	
 	socket.on("summoner", (data) => {
 		// attempt at ensuring data is safe and not completely messed up
