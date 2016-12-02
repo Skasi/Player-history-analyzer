@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+
+<!--
+TODO:
+Clean up file! There's still a lot of leftover code from back when the client was independent.
+-->
+
+<html lang="en-US">
+	<head>
+		<meta charset="utf-8">
+		<!-- TODO: support smaller screens <meta name="viewport" content="width=device-width">-->
+		<title>Player history analyzer</title>
+		<link rel="stylesheet" href="style.css">
+	</head>
+
+	<body>
+		<div id="readmes">
+			<div id="intro" class="mouseover">
+				<span><strong>✉ Introduction</strong></span>
+				<div class="more">
+					<p>This application tries to assist players in analyzing their performance and playstyles. It provides summaries for summoners, champions and items that occured in a player's match history. Contrary to many other websites it does not display statistics for whole regions or leagues, but instead focuses on a player.</p>
+					
+					<p>Note that results only display summoners, champions and items that occured at least a certain number of times (based on the number of total matches analyzed). This helps reduce clutter - especially for allied and enemy summoners. Games that ended in a /remake are not added to summaries. Item results count every single item purchase that was not undone. Wins shown are wins for the user you specify. That means the "Win" row on enemy champions shows how many of these champions were beaten.</p>
+				</div>
+			</div>
+			<div id="score" class="mouseover">
+				<span><strong>Score Calculation</strong></span>
+				<div class="more">
+					<p>Scores shown are meant to give an idea about a player's performance with a champion or item compared to each other. Basically they are calculated similar to ratios, but with a little twist:
+					<ul><li>If wins > losses, then the score = (wins+1)/(losses+2)
+					<li>If losses > wins, then the score = -(losses+1)/(wins+2)
+					<li>In case wins ans losses are equal, the score shows 0</ul>
+					This formula ensures that 200 wins vs 100 losses score higher than 2 wins vs 1 losses. A sample size of 300 is much more reliable than one of 3. Scores close to 0 indicate either balance or a lack of certainty.</p>
+					
+					<p>Do note that this score does not necessarily show the power of an item. Control wards for example will usually need to be replaced much more frequently by teams that do not dominate their enemy. As such they could easily get a negative score. The score you see merely suggests that something might be worth looking into.</p>
+				</div>
+			</div>
+			<div id="riot" class="mouseover">
+				<span><strong>I am not RITO</strong></span>
+				<div class="more">
+					<p>(<a href="https://developer.riotgames.com/terms#statement">source</a>) This application isn't endorsed by Riot Games and doesn't reflect the views or opinions of Riot Games or anyone officially involved in producing or managing League of Legends. League of Legends and Riot Games are trademarks or registered trademarks of Riot Games, Inc. League of Legends © Riot Games, Inc.</p>
+				</div>
+			</div>
+			<div id="contact" class="mouseover">
+				<span><strong>Contact Me</strong></span>
+				<div class="more">
+					<p>Feel free to contact me via reddit or ingame on EUW: Zeerius. I appreciate any bug reports and suggestions.</p>
+					
+					<p>Some of the bugs I already know about include: Item summaries fail to show names for items that were removed and no longer exist in the current season.</p>
+				</div>
+			</div>
+		</div>
+		<div id="formContainer">
+			<form id="form">
+				<label>Region*: <select id="region" required>
+					<option>EUW</option>
+					<option>NA</option>
+					<option>EUNE</option>
+					<option>KR</option>
+					<option>BR</option>
+					<option>JP</option>
+					<option>LAN</option>
+					<option>LAS</option>
+					<option>OCE</option>
+					<option>TR</option>
+					<option>RU</option>
+					<option>PBE</option>
+				</select></label><br>
+				<label>Username*: <input id="username" required /><span id="userId"></span></label><br>
+				<label>Champion: <input id="championName" /><span id="championId"></span></label><br><!-- TODO: Turn into dropdown list and get champion ID by name; OR: turn into name input field and look for name in champion list; also after username is entered, get a list of all champions that player used in rankeds -->
+				<!-- TODO: Put the last two input fields into some sort of "advanced settings" menu to keep the base tool simple -->
+				Game age: <input id="minAge" size="3" /> to <input id="maxAge" size="3" /> days<br> <!-- TODO: Add :active tooltip showing days since each patch -->
+				Games*: <input id="beginIndex" size="3" value="0" required /> to <input id="endIndex" size="3" value="100" required /><br>
+				<input type="submit" id="submit" value="Retrieve data" /><span id="matchlistInfo"></span>
+			</form>
+		</div>
+		<div id="data"></div>
+		<svg id="duration" viewbox="0 0 900 300"></svg>
+		<div id="result"></div>
+		
+		<!-- TODO: Figure out what's buggy about tablesort. Sometimes columns can only be sorted desc. -->
+		<script src="tablesort.js"></script>
+		<script src="levenshtein.js"></script>
+		<script src="/socket.io/socket.io.js"></script>
+		<script src="script.js"></script>
+	</body>
+</html>

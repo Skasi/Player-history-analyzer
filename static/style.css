@@ -1,0 +1,222 @@
+/* !!TODO:
+Bring back :hover showing overflow.
+Somehow get the website to display on mobile properly and performance-efficient. SVG causing problems on some low-end devices.
+*/
+
+* {
+	color: #eee;
+}
+
+html, body {
+	margin: 0%;
+	height: 100%;
+}
+body {
+	background: #000; /* For browsers that do not support gradients */
+	background:         radial-gradient(circle, #335, #000); /* Standard syntax */
+	background:      -o-radial-gradient(circle, #335, #000); /* Opera 11.6 to 12.0 */
+	background:    -moz-radial-gradient(circle, #335, #000); /* Firefox 3.6 to 15 */
+	background: -webkit-radial-gradient(circle, #335, #000); /* Safari */
+	background-attachment: fixed;
+}
+
+/* Fix crazy emoji line height on mobile (Android) */
+span {
+	line-height: 1em;
+}
+
+input, button, select, option, .more {
+	background-color: #000;
+}
+
+#readmes, form, #data {
+	float: left;
+	margin: 1px 1em;
+}
+
+#progress {
+	display: inline-block;
+}
+
+[disabled] {
+	opacity: 0.5;
+}
+
+#result {
+	display: flex;
+	justify-content: space-between;
+}
+
+/* SVG */
+#duration {
+	border-width: 1px 0;
+	border-style: solid;
+	border-color: #888;
+	width: 100%;
+}
+svg:empty {
+	display: none;
+}
+svg line, svg g {
+	mix-blend-mode: screen;
+}
+
+/* TABLES */
+table {
+	margin: 0 0 1em;
+	border: 1px solid #888;
+}
+
+.sortable th {
+	cursor: pointer;
+	
+	background: #000; /* For browsers that do not support gradients */
+	background:         linear-gradient(#fff, #aaa); /* Standard syntax */
+	background:      -o-linear-gradient(#fff, #aaa); /* Opera 11.6 to 12.0 */
+	background:    -moz-linear-gradient(#fff, #aaa); /* Firefox 3.6 to 15 */
+	background: -webkit-linear-gradient(#fff, #aaa); /* Safari */
+}
+.sortable th:hover {
+	outline: #fff solid 2px; 
+}
+.sortable th.sorttable_sorted, .sortable th.sorttable_sorted_reverse {
+	background: #000; /* For browsers that do not support gradients */
+	background:         linear-gradient(#aaa, #fff); /* Standard syntax */
+	background:      -o-linear-gradient(#aaa, #fff); /* Opera 11.6 to 12.0 */
+	background:    -moz-linear-gradient(#aaa, #fff); /* Firefox 3.6 to 15 */
+	background: -webkit-linear-gradient(#aaa, #fff); /* Safari */
+}
+.sortable th.sorttable_sorted:before { 
+	 content: "\25B4";
+	 text-shadow: 0 0 2px #f00;
+	 color: #000;
+}
+.sortable th:not(sorttable_sorted):before { 
+	 content: "\25B5";
+	 text-shadow: 0 0 2px #fff;
+	 color: #777;
+}
+.sortable th.sorttable_sorted_reverse:after { 
+	 content: "\25BE";
+	 text-shadow: 0 0 2px #f00;
+	 color: #000;
+}
+.sortable th:not(sorttable_sorted_reverse):after { 
+	 content: "\25BF";
+	 text-shadow: 0 0 2px #fff;
+	 color: #777;
+}
+
+/* Hide middle part of table */
+/*.minimize tr:nth-child(5) ~ tr {
+	display: none;
+}
+.minimize tr:nth-child(5) td {
+	display: none;
+}
+.minimize tr:nth-child(5):before {
+	content: "...";
+	display: block;
+}
+.minimize tr:nth-last-child(5) ~ tr {
+	display: table-row !important;
+}
+.minimize tr:nth-last-child(5) ~ tr td {
+	display: table-cell !important;
+}
+.minimize tr:nth-last-child(5) ~ tr:before {
+	display: none !important;
+}*/
+
+th:first-child, td:first-child {
+	max-width: 12ex;
+}
+th {
+	font-size: 120%;
+	background-color: #ccc;
+	color: #000;
+}
+th div {
+	color: inherit;
+	background-color: transparent;
+}
+th:not(:first-child) div {
+	width: 1.25em;
+	line-height: 1;
+	transform: rotate(90deg);
+	margin: 0 0 2.5ex calc(50% - 0.625em);
+}
+td:nth-child(2n) {
+	background-color: #444;
+}
+td:nth-child(2n+1) {
+	background-color: #000;
+}
+td:not(:first-child) {
+	text-align: right;
+	font-size: 80%;
+}
+td:not(:first-child)::first-letter {
+	font-size: 125%;
+}
+td:first-child {
+	/*position: relative;*/
+	overflow: hidden;
+	white-space: nowrap;
+	/*padding-right: 0.75ex;*/
+}
+td:first-child:hover {
+	/*overflow: visible;*/
+}
+td:first-child span {
+	background-color: inherit;
+}
+/* position: relative; needed for some reason to stop mouseoveroverflow from being semi-transparent.
+PROBLEM: padding-right DOES CAUSE slowdowns because column-width recalculates stuff all the time */
+td:first-child:hover span {
+	z-index: 1;
+}
+/* Highlight row on mouseover */
+tbody tr:hover {
+	outline: solid white 1px;
+}
+
+/* INPUTS */
+input, select, button {
+	border-color: #888;
+}
+input:hover, select:hover, button:hover {
+	border-color: #fff;
+}
+input:focus, select:focus, button:focus {
+	background-color: #fff;
+	color: #000;
+}
+
+/* MOUSEOVERS */
+.mouseover, [title] {
+	cursor: help;
+}
+.mouseover {
+	padding: 0.5em;
+	border: dashed 1px #fff;
+}
+.mouseover>span {
+	display: inline-block;
+	width: 100%;
+}
+.mouseover>.more {
+	cursor: auto;
+}
+.more {
+	visibility: hidden;
+	display: inline-block;
+	position: absolute;
+	z-index: 100;
+	padding: 1em;
+	border: dashed 1px #fff;
+	max-width: 60em;
+}
+:hover>.more {
+	visibility: visible;
+}
