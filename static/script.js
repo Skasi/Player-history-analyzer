@@ -82,7 +82,8 @@ function validateChampion() {
 	}
 }
 
-// Username validation
+// Username validation on region/username change
+regionInput.addEventListener("change", validateUsername)
 usernameInput.addEventListener("change", validateUsername)
 function validateUsername() {
 	if (!usernameInput.value) {
