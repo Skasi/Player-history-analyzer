@@ -585,7 +585,7 @@ form.onsubmit = function() {
 	// TODO: Ensure client has sufficient data before creating request for server
 	// request from server
 	matchlistInfoSpan.innerHTML = "requesting matchlist..."
-	var requestObject = {
+	var requestObject = compact({
 		region: region,
 		username: username,
 		championId: championId,
@@ -593,18 +593,13 @@ form.onsubmit = function() {
 		endIndex: endIndex,
 		beginTime: beginTime,
 		endTime: endTime
-	}
-	// DEBUGGING: wtf is championId === {}????
-	if (requestObject.championId === {}) {
-		var messageToLog = "IT'S HAPPENING AGAIN!!!\nrequestObject.championId =\n"+JSON.stringify(requestObject.championId)+"\nchampionNameInput.value =\n"+JSON.stringify(championNameInput.value)+"\n\nnavigator =\n"+JSON.stringify(navigator.userAgent)
-		socket.emit("log", messageToLog)
-	}
+	})
 	socket.emit("request", requestObject)
 	console.log(requestObject)
 	
 	return false
 }
-	
+
 function computeRating(wins, losses) {
 	//return (wins+1)/(losses+1)
 	
@@ -633,4 +628,13 @@ function stop() {
 	//resultDiv.className = "column"
 	// TODO: Make button not dis-/reappear in DOM. Instead show/hide via CSS.
 	document.getElementById("stop").remove()
+}
+
+// takes an object and removes values of null and undefined
+// eg. object{honk: true, foo: null} -> object{honk: true}
+function compact(obj) {
+	for (var key in obj) {
+		if (obj[key] == null) delete obj[key]
+	}
+	return obj
 }
