@@ -46,7 +46,7 @@ function validateChampion() {
 	var championInputName = championNameInput.value.toLowerCase()
 	if (!championInputName) {
 		championIdSpan.innerHTML = ""
-		championId = undefined
+		championId = null
 		return
 	}
 	
@@ -89,12 +89,12 @@ function validateUsername() {
 	if (!usernameInput.value) {
 		socket.off("summoner") // makes sure delayed responses don't overwrite empty innerHTML
 		userIdSpan.innerHTML = ""
-		userId = undefined
-		username = undefined
+		userId = null
+		username = null
 		return
 	}
 	userIdSpan.innerHTML = "⏳" // hourglass symbol for loading
-	userId = undefined
+	userId = null
 	username = usernameInput.value
 	var region = regionInput.options[regionInput.selectedIndex].text.toLowerCase()
 	socket.emit("summoner", {username: username, region: region})
