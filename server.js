@@ -358,6 +358,9 @@ io.on("connection", (socket) => {
 		)
 	})
 	
+	// Log certain messages the client sends for debugging purpose
+	socket.on("log", (msg) => { console.log("\x1b[7mClient sent message:\n"+msg+"\x1b[0m") })
+	
 	socket.on("stop", () => {
 		console.log("stopping")
 		requestQueue.clear(socket)
