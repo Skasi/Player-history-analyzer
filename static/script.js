@@ -594,6 +594,11 @@ form.onsubmit = function() {
 		beginTime: beginTime,
 		endTime: endTime
 	}
+	// DEBUGGING: wtf is championId === {}????
+	if (requestObject.championId === {}) {
+		var messageToLog = "IT'S HAPPENING AGAIN!!!\nrequestObject.championId =\n"+JSON.stringify(requestObject.championId)+"\nchampionNameInput.value =\n"+JSON.stringify(championNameInput.value)+"\n\nnavigator =\n"+JSON.stringify(navigator.userAgent)
+		socket.emit("log", messageToLog)
+	}
 	socket.emit("request", requestObject)
 	console.log(requestObject)
 	
