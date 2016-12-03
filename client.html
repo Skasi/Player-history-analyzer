@@ -26,11 +26,11 @@ Clean up file! There's still a lot of leftover code from back when the client wa
 			<div id="score" class="mouseover">
 				<span><strong>Score Calculation</strong></span>
 				<div class="more">
-					<p>Scores shown are meant to give an idea about a player's performance with a champion or item compared to each other. Basically they are calculated similar to ratios, but with a little twist:
+					<p>Scores shown are meant to give an idea about a player's performance with a champion or item compared to each other. Basically they are calculated similar to ratios, but with a little twist:</p>
 					<ul><li>If wins > losses, then the score = (wins+1)/(losses+2)
 					<li>If losses > wins, then the score = -(losses+1)/(wins+2)
 					<li>In case wins ans losses are equal, the score shows 0</ul>
-					This formula ensures that 200 wins vs 100 losses score higher than 2 wins vs 1 losses. A sample size of 300 is much more reliable than one of 3. Scores close to 0 indicate either balance or a lack of certainty.</p>
+					<p>This formula ensures that 200 wins vs 100 losses score higher than 2 wins vs 1 losses. A sample size of 300 is much more reliable than one of 3. Scores close to 0 indicate either balance or a lack of certainty.</p>
 					
 					<p>Do note that this score does not necessarily show the power of an item. Control wards for example will usually need to be replaced much more frequently by teams that do not dominate their enemy. As such they could easily get a negative score. The score you see merely suggests that something might be worth looking into.</p>
 				</div>
@@ -52,7 +52,7 @@ Clean up file! There's still a lot of leftover code from back when the client wa
 		</div>
 		<div id="formContainer">
 			<form id="form">
-				<label>Region*: <select id="region" required>
+				<label>Region*: <select id="region">
 					<option>EUW</option>
 					<option>NA</option>
 					<option>EUNE</option>
