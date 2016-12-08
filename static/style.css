@@ -49,10 +49,11 @@ input, button, select, option, .more {
 
 /* SVG */
 #duration {
-	border-width: 1px 0;
-	border-style: solid;
-	border-color: #888;
-	width: 100%;
+	/* outline-width does not support multiple parameters, so instead of using borders top/bot and outlines left/right we use outlines everywhere but add margin top/bot */
+	margin: 1px 0;
+	outline-width: 1px;
+	outline-style: solid;
+	outline-color: #888;
 }
 svg:empty {
 	display: none;
