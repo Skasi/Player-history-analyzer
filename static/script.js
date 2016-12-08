@@ -1,6 +1,8 @@
 "use strict"
 
-// TODO: Remember matches between requests so that server doesn't have to send the same matches again on next request. (Server should remember too)
+// TODO: Hide sorting buttons until progress == max
+
+// TODO: Remember matches between requests so that server doesn't have to send the same matches again on next request. (Server might want to keep recent games in memory too)
 
 // Get HTML elements by ID for use in JS
 var form = document.getElementById("form")
@@ -124,7 +126,8 @@ form.onsubmit = function() {
 			userId = msg[username.toLowerCase().split(" ").join("")].id
 			userIdSpan.innerHTML = "✔" // check mark for success
 		}
-		else userIdSpan.innerHTML = "❌" // cross mark for error
+		else
+			userIdSpan.innerHTML = "❌" // cross mark for error
 	})
 	
 	// Clear progress and totals only
@@ -211,6 +214,7 @@ form.onsubmit = function() {
 			else     --this.list[key].loss
 		}
 		
+		//!! TODO: Add support for sorting.
 		toTable(nameList, minimum) {
 			var tbody = ""
 			for (var key in this.list) {
@@ -225,10 +229,12 @@ form.onsubmit = function() {
 									(this.list[key].win || ""),
 									(this.list[key].loss || ""))
 			}
-			if (tbody.length > 0) return "<table class='sortable'>" + toHead(this.title) + tbody + "</table>"
-			return "<table><thead><tr><th>"+this.title+"</th></tr></thead></table>"
+			if (tbody.length > 0)
+				return "<table class='sortable'>" + toHead(this.title) + "<tbody>" + tbody + "</tbody></table>"
+			else
+				return "<table><thead><tr><th>"+this.title+"</th></tr></thead></table>"
 		}
-	}				
+	}
 
 	// DATA
 	
