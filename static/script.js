@@ -559,7 +559,7 @@ form.onsubmit = function() {
 		
 		// Scale SVG based on content
 		durationSvg.setAttribute("viewBox", "0 0 " + maxTime*10 + " " + maxGames*10)
-		durationSvg.style.width = maxTime*20 + "px"
+		durationSvg.style.width = maxTime*15 + "px"
 		durationSvg.innerHTML = svgCode
 		
 		// Hide some rarely occuring players/items/champs to reduce clutter when many games were analyzed
