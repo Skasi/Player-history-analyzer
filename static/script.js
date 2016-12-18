@@ -469,7 +469,7 @@ form.onsubmit = function() {
 		
 		// Draw game duration SVG graph
 		// Add some blank space to the right side
-		var maxTime = longestGame/60 + 10
+		var maxTime = Math.max(27.5, longestGame/60 + 5) // minimum time of 27.5m to fit legend
 		var maxGames = 0
 		
 		// mostGames used to find out highest bar
@@ -482,18 +482,20 @@ form.onsubmit = function() {
 			var l = lossGameLengths[i] || 0
 			maxGames = Math.max(w, l, maxGames)
 		}
-		maxGames += 10 // Add some blank space above
+		maxGames += 3 // Add some blank space above
 		// TODO: replace y height stuff
 		
 		// Horizontal background lines
 		for (var i = 1; i <= maxGames; i++) {
-			if ((maxGames-i)%10 == 0) {
-				svgCode += "<text x=" + maxTime*10 + " y="+i*10+" fill=#888 text-anchor=end dominant-baseline=text-after-edge>"+(maxGames-i)+" games</text>"
-				if (i != maxGames)
-					svgCode += "<line x1=5 x2=" + maxTime*10 + " y1="+i*10+" y2="+i*10+" stroke=#444 stroke-dasharray='90, 10' />"
-			}
-			else if ((maxGames-i)%5 == 0) svgCode += "<line x1=5 x2=" + maxTime*10 + " y1="+i*10+" y2="+i*10+" stroke=#444 stroke-dasharray='40, 10' />"
-			else svgCode += "<line x1=4 x2=" + maxTime*10 + " y1="+i*10+" y2="+i*10+" stroke=#555 stroke-dasharray='2, 8' />"
+			// labels for Y-axis
+			if ((maxGames-i)%5 == 0)
+				svgCode += "<text x=0 y="+i*10+" fill=#888 text-anchor=end dominant-baseline=middle>"+(maxGames-i)+" games</text>"
+			// alternating stroke dasharray
+			if ((maxGames-i)%10 == 0)
+				svgCode += "<line x1=5 x2=" + maxTime*10 + " y1="+i*10+" y2="+i*10+" stroke=#444 stroke-dasharray='90, 10' />"
+			else if ((maxGames-i)%5 == 0)
+				svgCode += "<line x1=5 x2=" + maxTime*10 + " y1="+i*10+" y2="+i*10+" stroke=#444 stroke-dasharray='40, 10' />"
+			//else svgCode += "<line x1=4 x2=" + maxTime*10 + " y1="+i*10+" y2="+i*10+" stroke=#555 stroke-dasharray='2, 8' />"
 		}
 		
 		// Vertical lines
@@ -505,15 +507,15 @@ form.onsubmit = function() {
 			if (w > 0) svgCode += "<line x1="+i*10+" x2="+i*10+" y1="+(maxGames*10-0.5)+" y2="+(maxGames*10-w*10)+" stroke-width=6 stroke=#0f0 stroke-dasharray='9, 1' />"
 			if (l > 0) svgCode += "<line x1="+i*10+" x2="+i*10+" y1="+(maxGames*10-0.5)+" y2="+(maxGames*10-l*10)+" stroke-width=6 stroke=#f00 stroke-dasharray='9, 1' />"
 			if (r > 0) svgCode += "<line x1="+i*10+" x2="+i*10+" y1="+(maxGames*10-0.5)+" y2="+(maxGames*10-r*10)+" stroke-width=6 stroke=#888 stroke-dasharray='9, 1' />"
-			// Background lines/dots
 			// 0m, 10m, 20m, ... timestamps and 3m /remake marker
-			if (i == 3 || (i%10 == 0 && i+10 < maxTime)) svgCode += "<text x="+i*10+" y=0 fill=#888 dominant-baseline=hanging>"+i+"m</text>"
+			if (i == 3 || (i%10 == 0 && i+2 < maxTime))
+				svgCode += "<text x="+i*10+" y="+(maxGames*10+5)+" fill=#888 text-anchor=middle dominant-baseline=hanging>"+i+"m</text>"
 		}
 		
 		//3m line
-		svgCode += "<line x1="+3*10+" x2="+3*10+" y1=5 y2="+maxGames*10+" stroke=#444 stroke-dasharray='40, 10' />"
+		svgCode += "<line x1="+3*10+" x2="+3*10+" y1="+(maxGames-0.5)*10+" y2=5 stroke=#444 stroke-dasharray='40, 10' />"
 		//20m line
-		svgCode += "<line x1="+20*10+" x2="+20*10+" y1=5 y2="+maxGames*10+" stroke=#444 stroke-dasharray='40, 10' />"
+		svgCode += "<line x1="+20*10+" x2="+20*10+" y1="+(maxGames-0.5)*10+" y2=5 stroke=#444 stroke-dasharray='40, 10' />"
 
 		// TODO: Add back mouseover text to numbers, use visibility: hidden/visible for improved performance
 		
@@ -521,47 +523,44 @@ form.onsubmit = function() {
 		var avgLossDuration = totalLossDuration/losses/60
 		
 		// Used to make sure average win and loss duration texts don't overlap unless equal
-		var avgWinTextAlign = ""
-		var avgLossTextAlign = ""
+		var avgWinTextAlign = "text-anchor=end"
+		var avgLossTextAlign = "text-anchor=end"
 		if (avgWinDuration && avgLossDuration) {
-			if (avgWinDuration > avgLossDuration) {
-				avgLossTextAlign = "text-anchor=end"
-			} else if (avgWinDuration < avgLossDuration) {
-				avgWinTextAlign = "text-anchor=end"
-			}
+			if (avgWinDuration > avgLossDuration)
+				avgWinTextAlign = "text-anchor=start"
+			else if (avgWinDuration < avgLossDuration)
+				avgLossTextAlign = "text-anchor=start"
 		}
-		// Legend
-		svgCode += "<g>"+
-		"<rect x=5 y=18 fill=#0f0 width=6 height=9 />"+
-		"<text x=15 y=15 fill=#0f0 dominant-baseline=hanging>Win</text>"+
-		"<rect x=5 y=33 fill=#ff0 width=6 height=9 />"+
-		"<text x=15 y=30 fill=#ff0 dominant-baseline=hanging>Win&Loss</text>"+
-		"<rect x=5 y=48 fill=#f00 width=6 height=9 />"+
-		"<text x=15 y=45 fill=#f00 dominant-baseline=hanging>Loss</text>"+
-		"<rect x=5 y=63 fill=#888 width=6 height=9 />"+
-		"<text x=15 y=60 fill=#888 dominant-baseline=hanging>Remake</text>"+
-		"</g>"
 			
 		// Average win
 		if (avgWinDuration) {
-			svgCode += "<g>"+
-			"<line x1="+avgWinDuration*10+" x2="+avgWinDuration*10+" y1=5 y2="+maxGames*10+" stroke=#0f0 stroke-dasharray='40, 10' />"+
-			"<text x="+avgWinDuration*10+" y=20 "+avgWinTextAlign+" fill=#0f0 dominant-baseline=hanging>avg.</text>"+
-			"<text x="+avgWinDuration*10+" y=35 "+avgWinTextAlign+" fill=#0f0 dominant-baseline=hanging>"+Math.floor(avgWinDuration*100+0.5)/100+"m</text>"+
-			"</g>"
+			svgCode +=
+			"<line x1="+avgWinDuration*10+" x2="+avgWinDuration*10+" y1="+(maxGames-0.5)*10+" y2=5 stroke=#0f0 stroke-dasharray='40, 10' />"+
+			"<text x="+avgWinDuration*10+" y=5 "+avgWinTextAlign+" fill=#0f0 dominant-baseline=hanging>avg. "+Math.floor(avgWinDuration*100+0.5)/100+"m</text>"
 		}
 		// Average loss
 		if (avgLossDuration) {
-			svgCode += "<g>"+
-			"<line x1="+avgLossDuration*10+" x2="+avgLossDuration*10+" y1=5 y2="+maxGames*10+" stroke=#f00 stroke-dasharray='40, 10' />"+
-			"<text x="+avgLossDuration*10+" y=20 "+avgLossTextAlign+" fill=#f00 dominant-baseline=hanging>avg.</text>"+
-			"<text x="+avgLossDuration*10+" y=35 "+avgLossTextAlign+" fill=#f00 dominant-baseline=hanging>"+Math.floor(avgLossDuration*100+0.5)/100+"m</text>"+
-			"</g>"
+			svgCode +=
+			"<line x1="+avgLossDuration*10+" x2="+avgLossDuration*10+" y1="+(maxGames-0.5)*10+" y2=5 stroke=#f00 stroke-dasharray='40, 10' />"+
+			"<text x="+avgLossDuration*10+" y=5 "+avgLossTextAlign+" fill=#f00 dominant-baseline=hanging>avg. "+Math.floor(avgLossDuration*100+0.5)/100+"m</text>"
 		}
 		
+		// Legend
+		svgCode += "<g>"+
+		"<rect x=-50 y="+(maxGames*10+30+3)+" fill=#888 width=6 height=9 />"+
+		"<text x=-40 y="+(maxGames*10+30)+"   fill=#888 dominant-baseline=hanging>Remake</text>"+
+		"<rect x=50  y="+(maxGames*10+30+3)+" fill=#0f0 width=6 height=9 />"+
+		"<text x=60  y="+(maxGames*10+30)+"   fill=#0f0 dominant-baseline=hanging>Win</text>"+
+		"<rect x=120 y="+(maxGames*10+30+3)+" fill=#ff0 width=6 height=9 />"+
+		"<text x=130 y="+(maxGames*10+30)+"   fill=#ff0 dominant-baseline=hanging>Win&Loss</text>"+
+		"<rect x=220 y="+(maxGames*10+30+3)+" fill=#f00 width=6 height=9 />"+
+		"<text x=230 y="+(maxGames*10+30)+"   fill=#f00 dominant-baseline=hanging>Loss</text>"+
+		"</g>"
+		
 		// Scale SVG based on content
-		durationSvg.setAttribute("viewBox", "0 0 " + maxTime*10 + " " + maxGames*10)
-		durationSvg.style.width = maxTime*15 + "px"
+		// add 75 and 50 svg-px left and bottom for labels and legend
+		durationSvg.setAttribute("viewBox", "-70 0 " + (maxTime*10 + 70) + " " + (maxGames*10 + 50))
+		durationSvg.style.width = (maxTime*15 + 135) + "px"
 		durationSvg.innerHTML = svgCode
 		
 		// Hide some rarely occuring players/items/champs to reduce clutter when many games were analyzed
