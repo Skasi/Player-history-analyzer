@@ -314,7 +314,7 @@ io.on("connection", (socket) => {
 			console.log("aborting matchhistory request - user's data not an object")
 			return
 		}
-		if (!data.region || !data.username || !data.beginIndex || data.beginIndex < 0 || !data.endIndex || data.endIndex < 1 || data.beginIndex >= data.endIndex) {
+		if (!data.region || !data.username || typeof(data.beginIndex) !== "number" || data.beginIndex < 0 || typeof(data.endIndex) !== "number" || data.endIndex < 1 || data.beginIndex >= data.endIndex) {
 			console.log("aborting matchhistory request - user's data insufficient")
 			return
 		}

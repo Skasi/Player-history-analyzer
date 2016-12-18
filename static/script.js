@@ -143,14 +143,16 @@ form.onsubmit = function() {
 	var maxAge = maxAgeInput.value
 	var beginTime
 	var endTime
-	var beginIndex = beginIndexInput.value
-	var endIndex = endIndexInput.value
+	var beginIndex = parseInt(beginIndexInput.value) || 0
+	beginIndexInput.value = beginIndex
+	var endIndex = parseInt(endIndexInput.value) || 100
+	endIndexInput.value = endIndex
 	var lastDrawn = 0
 	var progress = 0
 	
 	// Sanity check
-	if (!region || !username || !beginIndex || beginIndex < 0 || !endIndex || endIndex < 1 || beginIndex >= endIndex) {
-		matchlistInfoSpan.innerHTML = "Region and username required. All numbers must be positive. Last game can not be less than or equal the first game."
+	if (!region || !username || beginIndex < 0 || endIndex < 1 || beginIndex >= endIndex) {
+		matchlistInfoSpan.innerHTML = "Region and username required. Numbers must not be negative. Last game can not be less than or equal the first game."
 		return false
 	}
 	
