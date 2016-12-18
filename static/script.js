@@ -541,12 +541,6 @@ form.onsubmit = function() {
 			"<text x="+avgLossDuration*10+" y=35 "+avgLossTextAlign+" fill=#f00 dominant-baseline=hanging>"+Math.floor(avgLossDuration*100+0.5)/100+"m</text>"+
 			"</g>"
 		}
-		// Longest game
-		svgCode += "<g>"+
-		"<line x1="+longestGame/60*10+" x2="+longestGame/60*10+" y1=5 y2="+maxGames*10+" stroke=#00f stroke-dasharray='40, 10' />"+
-		"<text x="+longestGame/60*10+" y=50 fill=#00f dominant-baseline=hanging>max.</text>"+
-		"<text x="+longestGame/60*10+" y=65 fill=#00f dominant-baseline=hanging>"+Math.floor(longestGame/60*100+0.5)/100+"m</text>"+
-		"</g>"
 		
 		// Scale SVG based on content
 		durationSvg.setAttribute("viewBox", "0 0 " + maxTime*10 + " " + maxGames*10)
