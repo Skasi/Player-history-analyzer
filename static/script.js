@@ -1,5 +1,7 @@
 "use strict"
 
+// TODO: SVG: move "minutes" to bottom and "games" to left of the graph; move win/win&loss/loss to below the graph
+
 // TODO: Hide sorting buttons until progress == max
 
 // TODO: Remember matches between requests so that server doesn't have to send the same matches again on next request. (Server might want to keep recent games in memory too)
@@ -25,9 +27,9 @@ var submit = document.getElementById("submit")
 //var stop = document.getElementById("stop")
 
 // Actual data output
-var dataDiv = document.getElementById("data")
-var durationSvg = document.getElementById("duration")
-var resultDiv = document.getElementById("result")
+var dataDiv = document.getElementById("data") // contains progress and similar
+var durationSvg = document.getElementById("duration") // contains game length graph
+var resultDiv = document.getElementById("result") // contains allied/enemy/player champions/items, etc.
 
 // Socket initialization
 var items
@@ -153,17 +155,6 @@ form.onsubmit = function() {
 	}
 	
 	// TODO: Consider move champion and item data into some static file so it doesn't need to be sent via socket.
-	// championName -> championId
-	//if (championName) {
-	//	for (var key in champions) {
-	//		var champion = champions[key]
-	//		if ( champion.name.toLowerCase().split(" ").join("") == championName.toLowerCase().split(" ").join("")
-	//			|| champion.key.toLowerCase().split(" ").join("") == championName.toLowerCase().split(" ").join("") ){
-	//			championNameInput.value = champion.name
-	//			championId = champion.id
-	//			break
-	//		}
-	//	}
 	//	TODO: Create dropdown menu with automated filtering on champ name string input
 	
 	// maxAge -> beginTime
