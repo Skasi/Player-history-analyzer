@@ -1,8 +1,3 @@
-/* TODO:
-	* Make it possible to have multiple <tr>s in <thead> that are not sorted
-*/
-
-
 /*
   SortTable
   version 2
