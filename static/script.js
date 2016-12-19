@@ -1,7 +1,5 @@
 "use strict"
 
-// TODO: SVG: move "minutes" to bottom and "games" to left of the graph; move win/win&loss/loss to below the graph
-
 // TODO: Hide sorting buttons until progress == max
 
 // TODO: Remember matches between requests so that server doesn't have to send the same matches again on next request. (Server might want to keep recent games in memory too)
