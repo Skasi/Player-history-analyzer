@@ -279,29 +279,8 @@ io.on("connection", (socket) => {
 			}
 		}
 		
-		//!! TODO: Put this duplicated request in its own function, then replace its two instances
-		//!! TODO: Retry requesting summoner!
 		// Requesting Summoner info
-		requestQueue.append(
-			socket,
-			{
-				db: null,
-				url: "https://"+data.region+".api.pvp.net/api/lol/"+data.region+"/v1.4/summoner/by-name/"+data.username+"?",
-				action: (error, response, summonerData) => {
-					if (error || (response && response.statusCode != 200)) {
-						if (error || (response && response.statusCode == 429))
-							; //!! TODO: Retry requesting summoner!
-						console.log("Couldn't get summoner data!")
-						socket.emit("summoner")
-						return
-					}
-					// low-TODO: two socket.emit's could theoretically be merged into one
-					// send summoner info (id) to user
-					console.log("sending summoner data")
-					socket.emit("summoner", summonerData)
-				}
-			}
-		)
+		queueSummoner(socket, data)
 	})
 	
 	socket.on("request", (data) => {
@@ -326,36 +305,8 @@ io.on("connection", (socket) => {
 			}
 		}
 		
-		
 		// Requesting Summoner info
-		requestQueue.append(
-			socket,
-			{
-				db: null,
-				url: "https://"+data.region+".api.pvp.net/api/lol/"+data.region+"/v1.4/summoner/by-name/"+data.username+"?",
-				action: (error, response, summonerData) => {
-					if (error || (response && response.statusCode != 200)) {
-						if (error || (response && response.statusCode == 429))
-							; //!! TODO: Retry requesting summoner!
-						console.log("Couldn't get summoner data!")
-						socket.emit("summoner")
-						return
-					}
-					
-					// send summoner info (id) to user
-					console.log("sending summoner data")
-					socket.emit("summoner", summonerData)
-					
-					// get requested summoner's id
-					var summonerId = summonerData[data.username.toLowerCase().replace(/%20/g, "")].id
-					
-					// prepare matchlist url
-					var matchlistUrl = "https://"+data.region+".api.pvp.net/api/lol/"+data.region+"/v2.2/matchlist/by-summoner/"+summonerId+"?championIds="+(data.championId || "")+"&beginTime="+(data.beginTime || "")+"&endTime="+(data.endTime || "")+"&beginIndex="+(data.beginIndex || 0)+"&endIndex="+(data.endIndex || 100)
-					
-					queueMatchlist(socket, matchlistUrl, data)
-				}
-			}
-		)
+		queueSummoner(socket, data, true)
 	})
 	
 	// Log certain messages the client sends for debugging purpose
@@ -371,6 +322,101 @@ io.on("connection", (socket) => {
 		requestQueue.clear(socket)
 	})
 })
+
+// function to call itself for retries
+function queueSummoner(socket, data, queueWithMatchlist) {
+	requestQueue.append(
+		socket,
+		{
+			db: null,
+			url: "https://"+data.region+".api.pvp.net/api/lol/"+data.region+"/v1.4/summoner/by-name/"+data.username+"?",
+			action: (error, response, summonerData) => {
+				if (error || (response && response.statusCode != 200)) {
+					// log potential network error
+					if (error)
+						console.log("REQUEST ERROR for summoner\n", data, "\nerror:\n", error)
+					
+					// re-queue if error or 429 (retry-after is handled by request)
+					if (error || response.statusCode == 429 ||  response.statusCode == 503)
+						queueSummoner.apply(this, arguments)
+					else if (response.statusCode == 404) {
+						console.log("Summoner not found")
+						socket.emit("summoner")
+						if (queueWithMatchlist)
+							socket.emit("warning", "Summoner not found.")
+					} else {
+						socket.emit("warning", "Riot API sent " + response.statusCode + " status code.")
+					}
+					return
+				}
+				
+				// send summoner info (id) to user
+				console.log("sending summoner data")
+				socket.emit("summoner", summonerData)
+				
+				// optional callback for queuing matchlist
+				if (queueWithMatchlist) {
+					// get requested summoner's id
+					var summonerId = summonerData[data.username.toLowerCase().replace(/%20/g, "")].id
+					
+					// prepare matchlist url
+					var matchlistUrl = "https://"+data.region+".api.pvp.net/api/lol/"+data.region+"/v2.2/matchlist/by-summoner/"+summonerId+"?championIds="+(data.championId || "")+"&beginTime="+(data.beginTime || "")+"&endTime="+(data.endTime || "")+"&beginIndex="+(data.beginIndex || 0)+"&endIndex="+(data.endIndex || 100)
+					
+					queueMatchlist(socket, matchlistUrl, data)
+				}
+			}
+		}
+	)
+}
+
+// function to call itself for retries
+function queueMatchlist(socket, matchlistUrl, data) {
+	console.log("adding request for matchlist to queue, data:")
+	requestQueue.append(
+		socket,
+		{
+			db: null,
+			url: matchlistUrl,
+			action: (error, response, matchlistData) => {
+				// TODO: Consider rewriting all error-handlers to look like the following if-condition.
+				// TODO: Consider a function (name, url) where name eg. "matchlist"
+				if (error || (response && response.statusCode != 200)) {
+					if (error)
+						console.log("REQUEST ERROR for matchlist\n", matchlistUrl, "\nerror:\n", error)
+					else
+						console.log("REQUEST ERROR for matchlist\n", matchlistUrl, "\nstatus code:\n", response.statusCode)
+					
+					// re-queue if error or 429 (retry-after is handled by request)
+					if (error || response.statusCode == 429 ||  response.statusCode == 503)
+						queueMatchlist.apply(this, arguments)
+					else if (response.statusCode == 404) {
+						console.log("No matchlist found")
+						socket.emit("warning", "No matchlist found")
+					} else {
+						socket.emit("warning", "Riot API sent " + response.statusCode + " status code.")
+					}
+					return
+				}
+				
+				if (matchlistData.endIndex == 0 || !matchlistData.matches) {
+					console.log("Matchlist empty")
+					socket.emit("warning", "Matchlist empty")
+					return
+				}
+				
+				console.log("sending matchlist")
+				socket.emit("matchlist", { matchlistUrl: matchlistUrl, matchlist: matchlistData })
+				
+				for (var i = 0; i < matchlistData.matches.length; i++) {
+					var match = matchlistData.matches[i]
+					var matchUrl = "https://"+data.region+".api.pvp.net/api/lol/"+data.region+"/v2.2/match/"+match.matchId+"?includeTimeline=true"
+					
+					queueMatch(socket, matchUrl)
+				}
+			}
+		}
+	)
+}
 
 // function to call itself for retries
 function queueMatch(socket, matchUrl) {
@@ -395,55 +441,6 @@ function queueMatch(socket, matchUrl) {
 			
 				//console.log("sending match to user")
 				socket.emit("match", body)
-			}
-		}
-	)
-}
-
-// Requesting Matchlist
-function queueMatchlist(socket, matchlistUrl, data) {
-	console.log("adding request for matchlist to queue, data:")
-	requestQueue.append(
-		socket,
-		{
-			db: null,
-			url: matchlistUrl,
-			action: (error, response, matchlistData) => {
-				// TODO: Consider rewriting all error-handlers to look like the following if-condition.
-				// TODO: Consider a function (name, url) where name eg. "matchlist"
-				if (error || (response && response.statusCode != 200)) {
-					if (error)
-						console.log("REQUEST ERROR for matchlist\n", matchlistUrl, "\nerror:\n", error)
-					else
-						console.log("REQUEST ERROR for matchlist\n", matchlistUrl, "\nstatus code:\n", response.statusCode)
-					
-					// re-queue if error or 429 (retry-after is handled by request)
-					if (error || response.statusCode == 429)
-						queueMatchlist.apply(this, arguments)
-					else if (response.statuscode == 404) {
-						console.log("No matchlist found")
-						socket.emit("warning", "No matchlist found")
-					} else {
-						socket.emit("warning", "Riot API sent " + response.statusCode + " status code.")
-					}
-					return
-				}
-				
-				if (matchlistData.endIndex == 0 || !matchlistData.matches) {
-					console.log("Matchlist empty")
-					socket.emit("warning", "Matchlist empty")
-					return
-				}
-				
-				console.log("sending matchlist")
-				socket.emit("matchlist", { matchlistUrl: matchlistUrl, matchlist: matchlistData })
-				
-				for (var i = 0; i < matchlistData.matches.length; i++) {
-					var match = matchlistData.matches[i]
-					var matchUrl = "https://"+data.region+".api.pvp.net/api/lol/"+data.region+"/v2.2/match/"+match.matchId+"?includeTimeline=true"
-					
-					queueMatch(socket, matchUrl)
-				}
 			}
 		}
 	)
