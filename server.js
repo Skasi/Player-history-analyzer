@@ -33,7 +33,7 @@ TODO:
 Remember match histories for players. Only use these cached histories if riot servers are unresponsive.
 TODO:
 Deal with matches that were sent before a user made a new request but are recieved after this request. (done via socket.once and similar?)
-Make queues per-region for expected 2x speed.
+Make queues per-region for expected 2x speed on high usage.
 Get item data for older versions to reduce the occurance of N/As
 */
 

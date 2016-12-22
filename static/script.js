@@ -291,7 +291,10 @@ form.onsubmit = function() {
 			lastDrawn = Date.now()
 			drawResults(matchData)
 		}
-		if (progress === max) stop()
+		if (progress === max) {
+			matchlistInfoSpan.innerHTML = "Done!"
+			stop()
+		}
 		// TODO: Simplify calling of all the stuff to do after different steps
 	}
 
@@ -420,6 +423,7 @@ form.onsubmit = function() {
 				}
 			}
 			// high-TODO: Track W/L for player's skill orders
+			// TODO: Track keystones (and maybe other masteries)
 			// TODO: Track player's kills/deaths to enemy champions
 			// TODO: Track champion's red and blue -top/-mid/-bot/-jungle/-supp wins/deaths for super overkill detailed stats
 			// TODO: Very advanced - track "comeback items" vs "expand lead items" that lead to win when bought while (far) behind/ahead
