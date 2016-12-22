@@ -21,6 +21,14 @@ console.log("\x1b[7mInitializing server..\x1b[0m")
 
 
 /*
+HIGH-TODO:
+Apparently at very high request speeds (4ms timeout), retry-afters are not handled properly and can be skipped!
+REQUEST ERROR for match
+ https://euw.api.pvp.net/api/lol/euw/v2.2/match/2966806556?includeTimeline=true response:
+ 429
+SERVER SENT RETRY-AFTER FOR A TOTAL OF 8 TIMES NOW
+Retrying after 513000 ms
+
 TODO:
 Remember match histories for players. Only use these cached histories if riot servers are unresponsive.
 TODO:
@@ -44,6 +52,7 @@ var io = require("socket.io")(server) // socketio for communicating with the cli
 var levelup = require('levelup') // Responsible for accessing local database
 var requestLib = require("request") // Responsible for sending requests to Riot
 var apiKey = require("./APIKEY") // File storing the API key
+var config = require("./config") // Different configuration variables
 
 // listen to port
 if (process.env.PORT) {
@@ -153,7 +162,7 @@ class Queue {
 		this.timeout
 	}
 	
-	start(timer = 4) { // 1200 for dev key, 3.33333 for standard api key
+	start(timer = config.queueTimer) { // 1200 for dev key, 3.3333 for standard api key
 		// TODO: Add sanity check to warn in case of empty queue
 		if (!this.timeout)  {
 			//console.log("Starting queue timeout.")
@@ -180,8 +189,10 @@ class Queue {
 	// Caller needs to make sure to convert the delay from date or seconds to milliseconds
 	retryAfter(delay) {
 		// Only retryAfter if timeout already running
-		if (!this.timeout)
+		if (!this.timeout) {
+			console.log("\x1b[1mTimeout not running, cannot delay\x1b[0m")
 			return
+		}
 		
 		this.stop()
 		if (delay > 0)
