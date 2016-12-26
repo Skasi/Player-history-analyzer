@@ -475,8 +475,6 @@ function requestItems(url) {
 		}
 		console.log("Got ITEM data for version " + msg.version + ".")
 		
-		console.log("received item list length: " + Object.keys(msg.data).length)
-		
 		// Check if version of received list is newer or outdated, then merge data, prioritizing newer versions' data
 		// Object.assign prioritizes data from later object over prior ones
 		if (semver.gt(msg.version, itemsVersion)) {
@@ -486,8 +484,6 @@ function requestItems(url) {
 		} else
 			// received itemlist has an older version than the latest checked
 			items = Object.assign(msg.data, items)
-		
-		console.log("TOTAL item list length: " + Object.keys(items.length).length)
 	})
 }
 
