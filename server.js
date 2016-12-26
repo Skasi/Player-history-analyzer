@@ -48,9 +48,10 @@ var app = express()
 var server = require("http").Server(app)
 var io = require("socket.io")(server) // socketio for communicating with the client
 
-// other lib(stuff)
+// other libs
 var levelup = require('levelup') // Responsible for accessing local database
 var requestLib = require("request") // Responsible for sending requests to Riot
+var semver = require('semver') // Used to compare API's version numbering for item lists, eg: semver.gt('1.2.3', '9.8.7') // false
 var apiKey = require("./APIKEY") // File storing the API key
 var config = require("./config") // Different configuration variables
 
@@ -462,9 +463,9 @@ function queueMatch(socket, matchUrl) {
 // TODO: Change item- and champion info's request() to requestQueue
 
 // Item info
-var items
+var items = {}
+var itemsVersion = "0.0.0"
 function requestItems(url) {
-	console.log("Requesting items.")
 	request(null, url, (error, response, msg) => {
 		if (error || (response && response.statusCode != 200)) {
 			console.log("PROBLEM! Couldn't get ITEM data. Retrying.")
@@ -472,11 +473,23 @@ function requestItems(url) {
 				requestItems(url)
 			return
 		}
-		console.log("Got ITEM data.")
-		items = msg.data
+		console.log("Got ITEM data for version " + msg.version + ".")
+		
+		console.log("received item list length: " + Object.keys(msg.data).length)
+		
+		// Check if version of received list is newer or outdated, then merge data, prioritizing newer versions' data
+		// Object.assign prioritizes data from later object over prior ones
+		if (semver.gt(msg.version, itemsVersion)) {
+			itemsVersion = msg.version
+			// received itemlist has a newer version than the latest checked
+			items = Object.assign(items, msg.data)
+		} else
+			// received itemlist has an older version than the latest checked
+			items = Object.assign(msg.data, items)
+		
+		console.log("TOTAL item list length: " + Object.keys(items.length).length)
 	})
 }
-requestItems("https://global.api.pvp.net/api/lol/static-data/NA/v1.2/item?locale=en_US")
 
 // Champion info
 var champions
@@ -494,6 +507,28 @@ function requestChampion(url) {
 		champions = msg.data
 	})
 }
+
+// Versions
+function requestVersions(url) {
+	console.log("Requesting versions.")
+	request(null, url, (error, response, msg) => {
+		if (error || (response && response.statusCode != 200)) {
+			console.log("PROBLEM! Couldn't get ITEM data. Retrying.")
+			if (error || (response && response.statusCode == 429))
+				requestVersions(url)
+			return
+		}
+		console.log("Got VERSION data.")
+		
+		for (var i in msg) {
+			console.log("Requesting items for version " + msg[i] + ".")
+			requestItems("https://global.api.pvp.net/api/lol/static-data/NA/v1.2/item?locale=en_US&version=" + msg[i])
+		}
+	})
+}
+
+// Request game versions to then be able to request items for the different game versions
+requestVersions("https://global.api.pvp.net/api/lol/static-data/NA/v1.2/versions?")
 requestChampion("https://global.api.pvp.net/api/lol/static-data/NA/v1.2/champion?locale=en_US&dataById=true")
 
 
