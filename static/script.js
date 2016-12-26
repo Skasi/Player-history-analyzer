@@ -221,7 +221,7 @@ form.onsubmit = function() {
 									(this.list[key].loss || ""))
 			}
 			if (tbody.length > 0)
-				return "<table class='sortable'>" + toHead(this.title) + "<tbody>" + tbody + "</tbody></table>"
+				return "<table class='notYetSortable'>" + toHead(this.title) + "<tbody>" + tbody + "</tbody></table>"
 			else
 				return "<table><thead><tr><th>"+this.title+"</th></tr></thead></table>"
 		}
@@ -642,6 +642,12 @@ function computeRating(wins, losses) {
 function stop() {
 	console.log("stopping")
 	socket.emit("stop")
+	// Convert all .notYetSortable to .sortable
+	var notYetSortable = resultDiv.getElementsByClassName("notYetSortable")
+	while (notYetSortable.length > 0) {
+		notYetSortable[0].className = notYetSortable[0].className.replace("notYetSortable", "sortable")
+	}
+	// Initialize sorttable
 	sorttable.init()
 	// Add class to render tables in columns
 	//resultDiv.className = "column"
