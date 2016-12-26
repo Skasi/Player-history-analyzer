@@ -22,7 +22,7 @@ console.log("\x1b[7mInitializing server..\x1b[0m")
 
 /*
 HIGH-TODO:
-Apparently at very high request speeds (4ms timeout), retry-afters are not handled properly and can be skipped!
+Apparently at very high request speeds (4ms timeout), retry-afters are not handled properly and can be skipped! ISSUE PROBABLY CAUSED BECAUSE MULTIPLE REQUESTS ARE HAPPENING AT THE SAME TIME AND IF THE FIRST OF THEM LEADS TO A RETRY-AFTER THEN THE FOLLOWING ONES WILL TOO!
 REQUEST ERROR for match
  https://euw.api.pvp.net/api/lol/euw/v2.2/match/2966806556?includeTimeline=true response:
  429
@@ -460,7 +460,7 @@ function queueMatch(socket, matchUrl) {
 
 // GET STATIC DATA FROM RITO ONCE
 
-// TODO: Change item- and champion info's request() to requestQueue
+// TODO: Change item- and champion info's request() to requestQueue // necessary?
 
 // Item info
 var items = {}
@@ -493,7 +493,6 @@ function requestItems(url) {
 
 // Champion info
 var champions
-// TODO: Still needs to be updated every now and then for when new champions are released
 function requestChampion(url) {
 	console.log("Requesting champions.")
 	request(null, url, (error, response, msg) => {
@@ -530,8 +529,11 @@ function requestVersions(url) {
 // Request game versions to then be able to request items for the different game versions
 requestVersions("https://global.api.pvp.net/api/lol/static-data/NA/v1.2/versions?")
 requestChampion("https://global.api.pvp.net/api/lol/static-data/NA/v1.2/champion?locale=en_US&dataById=true")
+// TODO: Add some sort of intervall to update items and champions every now and then for when new stuff is released
 
 
+
+// Handle shutdown command
 process.on("SIGINT", () => {
 	console.log("SHUTTING DOWN")
 	matchDB.close()
