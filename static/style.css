@@ -43,6 +43,7 @@ input, button, select, option, .more {
 }
 
 #result {
+	clear: left;
 	display: flex;
 	justify-content: space-between;
 }

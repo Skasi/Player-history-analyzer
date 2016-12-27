@@ -256,6 +256,10 @@ form.onsubmit = function() {
 	var remakeGameLengths = []
 	
 	//extra stats
+	var totalKills = 0
+	var totalDeaths = 0
+	var totalAssists = 0
+	
 	var bestKDA = 0
 	var bestKDAmatchID
 	var bestKDAstats
@@ -328,6 +332,11 @@ form.onsubmit = function() {
 					bestKDAmatchID = matchData.matchId
 					bestKDAstats = p.stats.kills+"/"+p.stats.deaths+"/"+p.stats.assists
 				}
+				
+				// total KDA
+				totalKills += p.stats.kills
+				totalDeaths += p.stats.deaths
+				totalAssists += p.stats.assists
 				
 				playerChampions.increase(p.championId, win)
 				
@@ -462,7 +471,9 @@ form.onsubmit = function() {
 		
 		var outputTotalsTable = "<table><thead><tr><th></th><th>Sum</th><th>Win</th><th>Loss</th><th>Remake</th></tr></thead><tbody><tr><td>Games</td><td>"+(wins+losses)+"</td><td>"+wins+"</td><td>"+losses+"</td><td>"+remakes+"</td></tr></tbody></table>"
 		
-		var otherStats = "<span title='( Kills + Assists ) / ( Deaths ), where Deaths of 0 are replaced by 0.75'>Best KDA</span>: "+bestKDAstats+" (<a href=http://matchhistory."+region+".leagueoflegends.com/en/#match-details/"+region.toUpperCase()+"1/"+bestKDAmatchID+">match</a>)"
+		var otherStats = "<span>Average KDA</span>: "+(Math.ceil(totalKills/progress*100)/100)+"/"+(Math.ceil(totalDeaths/progress*100)/100)+"/"+(Math.ceil(totalAssists/progress*100)/100)+"</span><br>"+
+			"<span title='( Kills + Assists ) / ( Deaths ), where Deaths of 0 are replaced by 0.75'>Best KDA</span>: "+bestKDAstats+
+			" (<a href=http://matchhistory."+region+".leagueoflegends.com/en/#match-details/"+region.toUpperCase()+"1/"+bestKDAmatchID+">match</a>)"
 		
 		// Draw progress info
 		dataDiv.innerHTML = outputProgress + outputTotalsTable + otherStats
