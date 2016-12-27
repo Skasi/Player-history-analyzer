@@ -578,12 +578,18 @@ form.onsubmit = function() {
 		
 		// Hide some rarely occuring players/items/champs to reduce clutter when many games were analyzed
 		var minSum = Math.ceil(Math.log10(wins+losses))
+		// Only show all summoners for the initial n games
+		// Past that there will be a lot of players (potentially n*9) and the list would grow extremely long
+		if (wins+losses > 20)
+			var minBattlesForSummoners = 2
+		else
+			var minBattlesForSummoners = 1
 		
 		// TODO: Make 2nd parameters depend on table's length instead of wins+losses; let users get all available info on demand
 		resultDiv.innerHTML = "<div>"+
 									 playerChampions.toTable(champions, minSum)+
-									 allySummoners.toTable  (summoners, minSum)+
-									 enemySummoners.toTable (summoners, minSum)+
+									 allySummoners.toTable  (summoners, minBattlesForSummoners)+
+									 enemySummoners.toTable (summoners, minBattlesForSummoners)+
 									 "</div>"+
 									 allyChampions.toTable  (champions, minSum)+
 									 enemyChampions.toTable (champions, minSum)+
