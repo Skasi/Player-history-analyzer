@@ -206,7 +206,7 @@ form.onsubmit = function() {
 		}
 		
 		//!! TODO: Add support for sorting.
-		toTable(nameList, minimum) {
+		toTable(nameList, minimum = 0) {
 			var tbody = ""
 			for (var key in this.list) {
 				// Skip adding entries with occurences below <minimum> (optional parameter)
@@ -587,13 +587,13 @@ form.onsubmit = function() {
 		
 		// TODO: Make 2nd parameters depend on table's length instead of wins+losses; let users get all available info on demand
 		resultDiv.innerHTML = "<div>"+
-									 playerChampions.toTable(champions, minSum)+
+									 playerChampions.toTable(champions)+
 									 allySummoners.toTable  (summoners, minBattlesForSummoners)+
 									 enemySummoners.toTable (summoners, minBattlesForSummoners)+
 									 "</div>"+
 									 allyChampions.toTable  (champions, minSum)+
 									 enemyChampions.toTable (champions, minSum)+
-									 playerItems.toTable(items, minSum)+
+									 playerItems.toTable(items)+
 									 allyItems.toTable  (items, minSum)+
 									 enemyItems.toTable (items, minSum)
 									 
