@@ -1,6 +1,6 @@
 "use strict"
 
-// TODO: Hide sorting buttons until progress == max
+// TODO: Make summoner names (and maybe player-champion) clickable. Clicking them inserts their values into the appropriate input fields so that a user can then search with these parameters.
 
 // TODO: Remember matches between requests so that server doesn't have to send the same matches again on next request. (Server might want to keep recent games in memory too)
 
@@ -586,6 +586,8 @@ form.onsubmit = function() {
 			var minBattlesForSummoners = 1
 		
 		// TODO: Make 2nd parameters depend on table's length instead of wins+losses; let users get all available info on demand
+		//!! TODO: Show user that some things are hidden. Perhaps add "class=hidden" for things above the minimum to toTable function!
+		// TODO: Also add a "things hidden" tfooter or something
 		resultDiv.innerHTML = "<div>"+
 									 playerChampions.toTable(champions)+
 									 allySummoners.toTable  (summoners, minBattlesForSummoners)+

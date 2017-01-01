@@ -525,7 +525,7 @@ function requestVersions(url) {
 // Request game versions to then be able to request items for the different game versions
 requestVersions("https://global.api.pvp.net/api/lol/static-data/NA/v1.2/versions?")
 requestChampion("https://global.api.pvp.net/api/lol/static-data/NA/v1.2/champion?locale=en_US&dataById=true")
-// TODO: Add some sort of intervall to update items and champions every now and then for when new stuff is released
+// TODO: Add some sort of intervall to update items and champions every now and then for when new stuff is released - don't forget to reset: items = {}
 
 
 
