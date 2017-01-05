@@ -349,7 +349,7 @@ function queueSummoner(socket, data, queueWithMatchlist) {
 						console.log("REQUEST ERROR for summoner\n", data, "\nerror:\n", error)
 					
 					// re-queue if error or 429 (retry-after is handled by request)
-					if (error || response.statusCode == 429 ||  response.statusCode == 503)
+					if (error || response.statusCode == 429 || response.statusCode == 500 || response.statusCode == 503)
 						queueSummoner.apply(this, arguments)
 					else if (response.statusCode == 404) {
 						console.log("Summoner not found")
@@ -383,7 +383,7 @@ function queueSummoner(socket, data, queueWithMatchlist) {
 
 // function to call itself for retries
 function queueMatchlist(socket, matchlistUrl, data) {
-	console.log("adding request for matchlist to queue, data:")
+	console.log("adding request for matchlist to queue, url:\n", matchlistUrl)
 	requestQueue.append(
 		socket,
 		{
@@ -399,7 +399,7 @@ function queueMatchlist(socket, matchlistUrl, data) {
 						console.log("REQUEST ERROR for matchlist\n", matchlistUrl, "\nstatus code:\n", response.statusCode)
 					
 					// re-queue if error or 429 (retry-after is handled by request)
-					if (error || response.statusCode == 429 ||  response.statusCode == 503)
+					if (error || response.statusCode == 429 || response.statusCode == 500 || response.statusCode == 503)
 						queueMatchlist.apply(this, arguments)
 					else if (response.statusCode == 404) {
 						console.log("No matchlist found")
@@ -445,8 +445,8 @@ function queueMatch(socket, matchUrl) {
 						console.log("REQUEST ERROR for match\n", matchUrl, "response:\n", response.statusCode)
 				
 					// re-queue if error or 429 (retry-after is handled by request)
-					if (error || response.statusCode == 429 ||  response.statusCode == 503)
-						//!! TODO: Find out how to best handle 503s!
+					if (error || response.statusCode == 429 || response.statusCode == 500 || response.statusCode == 503)
+						//!! TODO: 503s could be handled by temporarily increasing the delay between requestQueue using a less-"extreme" retryAfter
 						queueMatch.apply(this, arguments)
 					return
 				}
