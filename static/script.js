@@ -281,7 +281,7 @@ form.onsubmit = function() {
 	}
 	
 	function toHead(title) {
-		return "<thead><tr><th><div>"+title+"</div></th><th><div>Sum</div></th><th><div>Win</div></th><th><div>Loss</div></th><th><div>Diff.</div></th><th title='Have a look at \"Score Calculation\" in the upper left.'><div>Score</div></th></tr></thead>"
+		return "<thead><tr><th><div>"+title+"</div></th><th><div class=rotated>Sum</div></th><th><div class=rotated>Win</div></th><th><div class=rotated>Loss</div></th><th><div class=rotated>Diff.</div></th><th title='Have a look at \"Score Calculation\" in the upper left.'><div class=rotated>Score</div></th></tr></thead>"
 	}
 	
 	function processMatch(matchData) {
@@ -574,6 +574,7 @@ form.onsubmit = function() {
 		// add 75 and 50 svg-px left and bottom for labels and legend
 		durationSvg.setAttribute("viewBox", "-70 0 " + (maxTime*10 + 70) + " " + (maxGames*10 + 50))
 		durationSvg.style.width = (maxTime*15 + 135) + "px"
+		durationSvg.style.height = (maxGames*15 + 75) + "px"
 		durationSvg.innerHTML = svgCode
 		
 		// Hide some rarely occuring players/items/champs to reduce clutter when many games were analyzed
