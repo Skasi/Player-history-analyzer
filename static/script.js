@@ -512,13 +512,18 @@ form.onsubmit = function() {
 		}
 		
 		// Vertical lines
-		for (var i = 0; i < maxTime; i++) { //!! TODO: Handle "games" counts
+		for (var i = 0; i < maxTime; i++) { //! TODO: Handle "games" counts //??
 			var w = winGameLengths[i] || 0
 			var l = lossGameLengths[i] || 0
+			var both = Math.min(w, l)
 			var r = remakeGameLengths[i] || 0
-			// Lines for wins and losses
-			if (w > 0) svgCode += "<line x1="+i*10+" x2="+i*10+" y1="+(maxGames*10-0.5)+" y2="+(maxGames*10-w*10)+" stroke-width=6 stroke=#0f0 stroke-dasharray='9, 1' />"
-			if (l > 0) svgCode += "<line x1="+i*10+" x2="+i*10+" y1="+(maxGames*10-0.5)+" y2="+(maxGames*10-l*10)+" stroke-width=6 stroke=#f00 stroke-dasharray='9, 1' />"
+			// Yellow lines
+			if (both > 0) svgCode += "<line x1="+i*10+" x2="+i*10+" y1="+(maxGames*10-0.5)+" y2="+((maxGames-both)*10)+" stroke-width=6 stroke=#ff0 stroke-dasharray='9, 1' />"
+			// Green lines for wins > losses
+			if (w > both) svgCode += "<line x1="+i*10+" x2="+i*10+" y1="+((maxGames-both)*10-0.5)+" y2="+((maxGames-w)*10)+" stroke-width=6 stroke=#0f0 stroke-dasharray='9, 1' />"
+			// Red lines for losses > wins
+			if (l > both) svgCode += "<line x1="+i*10+" x2="+i*10+" y1="+((maxGames-both)*10-0.5)+" y2="+((maxGames-l)*10)+" stroke-width=6 stroke=#f00 stroke-dasharray='9, 1' />"
+			// Grey lines for remakes
 			if (r > 0) svgCode += "<line x1="+i*10+" x2="+i*10+" y1="+(maxGames*10-0.5)+" y2="+(maxGames*10-r*10)+" stroke-width=6 stroke=#888 stroke-dasharray='9, 1' />"
 			// 0m, 10m, 20m, ... timestamps and 3m /remake marker
 			if (i == 3 || (i%10 == 0 && i+2 < maxTime))
