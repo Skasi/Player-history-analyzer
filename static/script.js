@@ -578,7 +578,7 @@ form.onsubmit = function() {
 		// Scale SVG based on content
 		// add 75 and 50 svg-px left and bottom for labels and legend
 		durationSvg.setAttribute("viewBox", "-70 0 " + (maxTime*10 + 70) + " " + (maxGames*10 + 50))
-		durationSvg.style.width = (maxTime*15 + 135) + "px"
+		durationSvg.style.width = (maxTime*15 + 105) + "px"
 		durationSvg.style.height = (maxGames*15 + 75) + "px"
 		durationSvg.innerHTML = svgCode
 		
