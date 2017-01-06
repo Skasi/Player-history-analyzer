@@ -209,10 +209,6 @@ input:focus, select:focus, button:focus {
 	padding: 0.5em;
 	border: dashed 1px #fff;
 }
-.mouseover>span {
-	display: inline-block;
-	width: 100%;
-}
 .mouseover>.more {
 	cursor: auto;
 }
