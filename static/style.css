@@ -70,7 +70,7 @@ table {
 	display: none;
 }
 .showAll .belowMinimum {
-	display: initial;
+	display: table-row;
 }
 
 .notYetSortable th, .sortable th {
@@ -81,8 +81,8 @@ table {
 	background: -webkit-linear-gradient(#fff, #aaa); /* Safari */
 }
 
-.sortable th {
-	cursor: pointer;
+.sortable th, .revealButton {
+	cursor: pointer !important; /* override help-pointers from [title] and similar */
 }
 .sortable th:hover {
 	outline: #fff solid 2px; 
@@ -160,14 +160,14 @@ td:nth-child(2n) {
 td:nth-child(2n+1) {
 	background-color: #000;
 }
-td:not(:first-child) {
+.statNumber {
 	text-align: right;
 	font-size: 80%;
 }
-td:not(:first-child)::first-letter {
+.statNumber::first-letter {
 	font-size: 125%;
 }
-td:first-child {
+.statName {
 	/*position: relative;*/
 	overflow: hidden;
 	white-space: nowrap;
@@ -176,7 +176,7 @@ td:first-child {
 /*td:first-child:hover {
 	overflow: visible;
 }*/
-td:first-child span {
+.statName span {
 	background-color: inherit;
 }
 /* position: relative; needed for some reason to stop mouseoveroverflow from being semi-transparent.

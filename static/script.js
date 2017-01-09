@@ -205,24 +205,43 @@ form.onsubmit = function() {
 			else     --this.list[key].loss
 		}
 		
-		//!! TODO: Add support for sorting.
+		//! TODO: Add support for sorting.
 		toTable(nameList, minimum = 0) {
-			var tbody = ""
+			var tbodyContent = ""
+			var tfoot = ""
+			// Variable used to verify if anything will be hidden at all
+			var itemsBelowMinimum = 0
+			
 			for (var key in this.list) {
-				// Skip adding entries with occurences below <minimum> (optional parameter)
-				if (this.list[key].win + this.list[key].loss < minimum) continue
+				var classAttribute
+				// Check for occurences below <minimum> (optional parameter)
+				if (this.list[key].win + this.list[key].loss < minimum) {
+					itemsBelowMinimum++
+					classAttribute = "belowMinimum"
+				}
+				else
+					classAttribute = ""
 				
+				var win = (this.list[key].win || "")
+				var loss = (this.list[key].loss || "")
 				var name
 				if (nameList && nameList[key]) name = nameList[key].name || nameList[key]
 				else name = "N/A: " + key
-				tbody += toRow(name,
-									this.list[key].win + this.list[key].loss,
-									(this.list[key].win || ""),
-									(this.list[key].loss || ""))
+				
+				tbodyContent += "<tr class=" + classAttribute + ">"
+				/* Name   */  + "<td class=statName><span>" + name + "</span></td>"
+				/* Sum    */  + "<td class=statNumber><span>" + (win+loss) + "</span></td>"
+				/* Wins   */  + "<td class=statNumber><span>" + win + "</span></td>"
+				/* Losses */  + "<td class=statNumber><span>" + loss + "</span></td>"
+				/* Diff   */  + "<td class=statNumber><span>" + (win-loss) + "</span></td>"
+				/* Score  */  + "<td class=statNumber><span>" + Math.floor(computeRating(win, loss)*100 + 0.5)/100 + "</span></td>"
+				              + "</tr>"
 			}
-			if (tbody.length > 0)
-				return "<table class='notYetSortable'>" + toHead(this.title) + "<tbody>" + tbody + "</tbody></table>"
-			else
+			if (tbodyContent.length > 0 || itemsBelowMinimum) { // low-TODO: There can be very special cases in which all content is hidden. Is that okay?
+				if (itemsBelowMinimum)
+					tfoot += "<tfoot onclick=reveal(this)><tr><td class=revealButton colspan=6 title='rows were hidden because their occurance was below " + minimum + "'>" + itemsBelowMinimum + " rows hidden - click to reveal</td></tr></tfoot>" //!! TODO: Add clickeventlistener
+				return "<table class=notYetSortable>" + toHead(this.title) + "<tbody>" + tbodyContent + "</tbody>" + tfoot + "</table>"
+			} else
 				return "<table><thead><tr><th>"+this.title+"</th></tr></thead></table>"
 		}
 	}
@@ -263,22 +282,6 @@ form.onsubmit = function() {
 	var bestKDA = 0
 	var bestKDAmatchID
 	var bestKDAstats
-	
-	// Returns "<tr><td>argument_1</td><td>argument_2</td>...<td>argument_n</td></tr>"
-	function toRow() {
-		// Start row
-		var output = "<tr>"
-		// add each argument as a separate column
-		for (var i = 0; i < arguments.length; i++) {
-			output += "<td><span>" + arguments[i] + "</span></td>"
-		}
-		// add diff and ratio
-		output += "<td>" + (arguments[2] - arguments[3]) + "</td>"
-		// TODO: Make it so "2218" gets turned into "2k" and only shows "2218" on :hover
-		output += "<td>" + Math.floor(computeRating(arguments[2], arguments[3])*100 + 0.5)/100 + "</td>"
-		// End row
-		return output + "</tr>"
-	}
 	
 	function toHead(title) {
 		return "<thead><tr><th><div>"+title+"</div></th><th><div class=rotated>Sum</div></th><th><div class=rotated>Win</div></th><th><div class=rotated>Loss</div></th><th><div class=rotated>Diff.</div></th><th title='Have a look at \"Score Calculation\" in the upper left.'><div class=rotated>Score</div></th></tr></thead>"
@@ -591,9 +594,7 @@ form.onsubmit = function() {
 		else
 			var minBattlesForSummoners = 1
 		
-		// TODO: Make 2nd parameters depend on table's length instead of wins+losses; let users get all available info on demand
-		//!! TODO: Show user that some things are hidden. Perhaps add "class=hidden" for things above the minimum to toTable function!
-		// TODO: Also add a "things hidden" tfooter or something
+		// TODO: Make 2nd parameters depend on table's length instead of wins+losses
 		resultDiv.innerHTML = "<div>"+
 									 playerChampions.toTable(champions)+
 									 allySummoners.toTable  (summoners, minBattlesForSummoners)+
@@ -678,6 +679,11 @@ function stop() {
 	//resultDiv.className = "column"
 	// TODO: Make button not dis-/reappear in DOM. Instead show/hide via CSS.
 	document.getElementById("stop").remove()
+}
+
+function reveal(e) {
+	e.parentElement.classList.add("showAll")
+	e.remove()
 }
 
 // takes an object and removes values of null and undefined
