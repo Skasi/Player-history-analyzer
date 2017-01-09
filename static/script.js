@@ -1,7 +1,9 @@
 "use strict"
 
+// TODO: Redo how tables are drawn. Merge tablesort into the system.
+// TODO: Redo "click to reveal": Don't hide items if only 1-4 would be hidden in the first place.
+// TODO: Find a way to present enchanted items. Right now item names only show "Enchantment: Warrior Enchantment: Cinderhulk Enchantment: Runic Echoes Enchantment: Warrior Enchantment: Cinderhulk Enchantment: Warrior Enchantment: Cinderhulk Enchantment: Runic Echoes Enchantment: Bloodrazor"
 // TODO: Make summoner names (and maybe player-champion) clickable. Clicking them inserts their values into the appropriate input fields so that a user can then search with these parameters.
-
 // TODO: Remember matches between requests so that server doesn't have to send the same matches again on next request. (Server might want to keep recent games in memory too)
 
 // Get HTML elements by ID for use in JS
@@ -114,7 +116,7 @@ function validateUsername() {
 // TODO: Auto validate other inputs (game age (max>min>=0 and max>=1) and games (max>min>=0))
 
 form.onsubmit = function() {
-	//!! TODO: only allow this request if username is already correct
+	//! TODO: only allow this request if username is already correct
 	// Temporarily disable submit button to prevent submit spam
 	submit.disabled = true
 	setTimeout(() => submit.disabled = false, 2000)
@@ -434,7 +436,8 @@ form.onsubmit = function() {
 						allyFinalItems.increase(participant.stats["item"+n], win)
 				}
 			}
-			// high-TODO: Track W/L for player's skill orders
+			// TODO: Track W/L for player's skill orders
+			// TODO: Track picks and bans
 			// TODO: Track keystones (and maybe other masteries)
 			// TODO: Track player's kills/deaths to enemy champions
 			// TODO: Track champion's red and blue -top/-mid/-bot/-jungle/-supp wins/deaths for super overkill detailed stats
@@ -595,6 +598,7 @@ form.onsubmit = function() {
 			var minBattlesForSummoners = 1
 		
 		// TODO: Make 2nd parameters depend on table's length instead of wins+losses
+		// TODO: Ally- and Enemy items are less interesting and should be more hidden
 		resultDiv.innerHTML = "<div>"+
 									 playerChampions.toTable(champions)+
 									 allySummoners.toTable  (summoners, minBattlesForSummoners)+
