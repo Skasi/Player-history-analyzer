@@ -516,7 +516,7 @@ function requestVersions(url) {
 		
 		for (var i in msg) {
 			console.log("Requesting items for version " + msg[i] + ".")
-			requestItems("https://global.api.pvp.net/api/lol/static-data/NA/v1.2/item?locale=en_US&version=" + msg[i])
+			requestItems("https://global.api.pvp.net/api/lol/static-data/NA/v1.2/item?itemListData=from&locale=en_US&version=" + msg[i])
 		}
 	})
 }

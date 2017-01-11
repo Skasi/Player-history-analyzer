@@ -230,8 +230,11 @@ form.onsubmit = function() {
 				if (nameList && nameList[key]) name = nameList[key].name || nameList[key]
 				else name = "N/A: " + key
 				
+				// Special case for enchanted jungler items. These names only contain the enchantment name, they are missing the actual jungle item that was enchanted. Here I add the actual item name before the enchantment. The actual item name is gained by via the id the last (hopefully that wont change) entry in the "from" array.
+				if (name.includes("Enchantment")) name = nameList[nameList[key].from[nameList[key].from.length - 1]].name + " " + name
+				
 				tbodyContent += "<tr class=" + classAttribute + ">"
-				/* Name   */  + "<td class=statName><span>" + name + "</span></td>"
+				/* Name   */  + '<td class=statName title="' + name + '"><span>' + name + "</span></td>"
 				/* Sum    */  + "<td class=statNumber><span>" + (win+loss) + "</span></td>"
 				/* Wins   */  + "<td class=statNumber><span>" + win + "</span></td>"
 				/* Losses */  + "<td class=statNumber><span>" + loss + "</span></td>"
