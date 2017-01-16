@@ -1,9 +1,10 @@
 "use strict"
 
+// TODO: Add support for search parameters in url
+// TODO: Show more player stats. Division, etc.
 // TODO: Redo how tables are drawn. Merge tablesort into the system.
 // TODO: Redo "click to reveal": Don't hide items if only 1-4 would be hidden in the first place.
-// TODO: Find a way to present enchanted items. Right now item names only show "Enchantment: Warrior Enchantment: Cinderhulk Enchantment: Runic Echoes Enchantment: Warrior Enchantment: Cinderhulk Enchantment: Warrior Enchantment: Cinderhulk Enchantment: Runic Echoes Enchantment: Bloodrazor"
-// TODO: Make summoner names (and maybe player-champion) clickable. Clicking them inserts their values into the appropriate input fields so that a user can then search with these parameters.
+// TODO: Make summoner names (and maybe player-champions) clickable. Clicking them inserts their values into the appropriate input fields so that a user can then search with these parameters.
 // TODO: Remember matches between requests so that server doesn't have to send the same matches again on next request. (Server might want to keep recent games in memory too)
 
 // Get HTML elements by ID for use in JS
@@ -27,7 +28,7 @@ var submit = document.getElementById("submit")
 //var stop = document.getElementById("stop")
 
 // Actual data output
-var dataDiv = document.getElementById("data") // contains progress and similar
+var dataDiv = document.getElementById("data") // contains progress, summaries and similar
 var durationSvg = document.getElementById("duration") // contains game length graph
 var resultDiv = document.getElementById("result") // contains allied/enemy/player champions/items, etc.
 
@@ -40,7 +41,7 @@ socket.once("champions", (msg) => { champions = msg })
 var summoners = {}
 
 var championId
-var userId
+var user
 var username
 
 // TODO: find ACTUAL AUTOCOMPLETION and correction library with dropdown and all that super fancy stuff
@@ -48,6 +49,7 @@ var username
 championNameInput.addEventListener("change", validateChampion)
 function validateChampion() {
 	var championInputName = championNameInput.value.toLowerCase()
+	
 	if (!championInputName) {
 		championIdSpan.innerHTML = ""
 		championId = null
@@ -56,9 +58,9 @@ function validateChampion() {
 	
 	// Try to find the closest champion name match
 	var leastDiffRatio = 1
-	var mostSimilarKey
-	for (var key in champions) {
-		var champion = champions[key]
+	var mostSimilarId
+	for (var id in champions) {
+		var champion = champions[id]
 		
 		// Get similarity
 		var lev = new Levenshtein(champion.name.toLowerCase(), championInputName)
@@ -67,22 +69,22 @@ function validateChampion() {
 		// Check if more similar than others
 		if (diffRatio < leastDiffRatio) {
 			leastDiffRatio = diffRatio
-			mostSimilarKey = key
+			mostSimilarId = id
 			// Perfect match
 			if (diffRatio == 0) break
 		}
 	}
 	
-	if (leastDiffRatio <= 0.25) {
-		championIdSpan.innerHTML = "✔" // check mark for success
-		championNameInput.value = champions[mostSimilarKey].name
-		championId = champions[mostSimilarKey].id
-	} else if (leastDiffRatio <= 0.5) {
-		championIdSpan.innerHTML = "❓" // question mark for unsure
-		championNameInput.value = champions[mostSimilarKey].name
-		championId = champions[mostSimilarKey].id
+	if (leastDiffRatio <= 0.5) {
+		if (leastDiffRatio <= 0.25)
+			championIdSpan.innerHTML = "✔" // check mark for success
+		else
+			championIdSpan.innerHTML = "❓" // question mark for unsure
+		championNameInput.value = champions[mostSimilarId].name
+		championId = champions[mostSimilarId].id
 	} else {
 		championIdSpan.innerHTML = "❌" // cross mark for error
+		championId = null
 	}
 }
 
@@ -90,23 +92,26 @@ function validateChampion() {
 regionInput.addEventListener("change", validateUsername)
 usernameInput.addEventListener("change", validateUsername)
 function validateUsername() {
+		userIdSpan.innerHTML = ""
+		user = null
 	if (!usernameInput.value) {
 		socket.off("summoner") // makes sure delayed responses don't overwrite empty innerHTML
-		userIdSpan.innerHTML = ""
-		userId = null
-		username = null
 		return
 	}
 	userIdSpan.innerHTML = "⏳" // hourglass symbol for loading
-	userId = null
-	username = usernameInput.value
-	var region = regionInput.options[regionInput.selectedIndex].text.toLowerCase()
-	socket.emit("summoner", {username: username, region: region})
 	
+	socket.emit("summoner", {
+		username: usernameInput.value,
+		region: regionInput.options[regionInput.selectedIndex].text.toLowerCase()
+	})
+	expectSummonerMessage()
+}
+
+function expectSummonerMessage() {
 	socket.once("summoner", (msg) => {
 		if (msg) {
-			usernameInput.value = msg[username.toLowerCase().split(" ").join("")].name
-			userId = msg[username.toLowerCase().split(" ").join("")].id
+			user = msg[usernameInput.value.toLowerCase().split(" ").join("")]
+			usernameInput.value = user.name
 			userIdSpan.innerHTML = "✔" // check mark for success
 		}
 		else userIdSpan.innerHTML = "❌" // cross mark for error
@@ -116,21 +121,13 @@ function validateUsername() {
 // TODO: Auto validate other inputs (game age (max>min>=0 and max>=1) and games (max>min>=0))
 
 form.onsubmit = function() {
-	//! TODO: only allow this request if username is already correct
+	
 	// Temporarily disable submit button to prevent submit spam
 	submit.disabled = true
 	setTimeout(() => submit.disabled = false, 2000)
 	
 	validateChampion()
-	socket.once("summoner", (msg) => {
-		if (msg) {
-			usernameInput.value = msg[username.toLowerCase().split(" ").join("")].name
-			userId = msg[username.toLowerCase().split(" ").join("")].id
-			userIdSpan.innerHTML = "✔" // check mark for success
-		}
-		else
-			userIdSpan.innerHTML = "❌" // cross mark for error
-	})
+	expectSummonerMessage()
 	
 	// Clear progress and totals only
 	dataDiv.innerHTML = ""
@@ -208,6 +205,7 @@ form.onsubmit = function() {
 		}
 		
 		//! TODO: Add support for sorting.
+		// TODO: Perhaps namelist should be a second parameter added to new StatCategory; though lists like items and champions might update after a StatCategory was constructed
 		toTable(nameList, minimum = 0) {
 			var tbodyContent = ""
 			var tfoot = ""
@@ -329,7 +327,7 @@ form.onsubmit = function() {
 		// First look for player
 		for (var pId in matchData.participants) {
 			var p = matchData.participants[pId]
-			if (matchData.participantIdentities[pId].player.summonerId == userId) {
+			if (matchData.participantIdentities[pId].player.summonerId == user.id) {
 				playerTeam = p.teamId
 				win = p.stats.winner
 				
@@ -379,7 +377,7 @@ form.onsubmit = function() {
 					var player = matchData.participantIdentities[pId].player
 					
 					// player
-					if (player.summonerId == userId) {
+					if (player.summonerId == user.id) {
 						if (type === "ITEM_PURCHASED") playerItems.increase(event.itemId, win)
 						// decrease item on mispurchase, ignore itemBefore with id 0 (which happens when undoing a sell)
 						else if (type === "ITEM_UNDO" && event.itemBefore > 0) playerItems.decrease(event.itemBefore, win)
@@ -412,7 +410,7 @@ form.onsubmit = function() {
 			var player = matchData.participantIdentities[pId].player
 			
 			// skip player
-			if (player.summonerId == userId)
+			if (player.summonerId == user.id)
 				continue
 			
 			// memorize name linked to id
