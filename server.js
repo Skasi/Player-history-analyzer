@@ -269,8 +269,9 @@ var requestQueue = new Queue()
 io.on("connection", (socket) => {
 	console.log("\nNEW CONNECTION!\n")
 	
-	socket.emit("items", items, () => { console.log("player received items") })
+	socket.emit("latestVersion", latestVersion, () => { console.log("player received latest version") })
 	socket.emit("champions", champions, () => { console.log("player received champions") })
+	socket.emit("items", items, () => { console.log("player received items") })
 	
 	socket.on("summoner", (data) => {
 		// attempt at ensuring data is safe and not completely messed up
@@ -503,6 +504,7 @@ function requestChampion(url) {
 }
 
 // Versions
+var latestVersion
 function requestVersions(url) {
 	console.log("Requesting versions.")
 	request(null, url, (error, response, msg) => {
@@ -513,6 +515,8 @@ function requestVersions(url) {
 			return
 		}
 		console.log("Got VERSION data.")
+		
+		latestVersion = msg[0]
 		
 		for (var i in msg) {
 			console.log("Requesting items for version " + msg[i] + ".")

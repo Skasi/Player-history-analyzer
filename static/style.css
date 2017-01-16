@@ -1,5 +1,9 @@
 /* !!TODO:
+Chrome bug: Chrome overwrites background color and image using !important rules; can probably be dealt with somehow
+bugreport: https://bugs.chromium.org/p/chromium/issues/detail?id=46543
+
 Bring back :hover showing overflow.
+
 Somehow get the website to display on mobile properly and performance-efficient. SVG causing problems on some low-end devices.
 */
 
@@ -32,6 +36,12 @@ input, button, select, option, .more {
 #readmes, #formContainer, #data {
 	float: left;
 	margin: 1px 1em;
+}
+
+#username, #championName {
+	background-size: contain;
+	background-position: right;
+	background-repeat: no-repeat;
 }
 
 #progress {

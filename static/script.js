@@ -33,11 +33,13 @@ var durationSvg = document.getElementById("duration") // contains game length gr
 var resultDiv = document.getElementById("result") // contains allied/enemy/player champions/items, etc.
 
 // Socket initialization
-var items
+var latestVersion
 var champions
+var items
 var socket = io.connect()
-socket.once("items", (msg) => { items = msg })
+socket.once("latestVersion", (msg) => { latestVersion = msg })
 socket.once("champions", (msg) => { champions = msg })
+socket.once("items", (msg) => { items = msg })
 var summoners = {}
 
 var championId
@@ -53,6 +55,7 @@ function validateChampion() {
 	if (!championInputName) {
 		championIdSpan.innerHTML = ""
 		championId = null
+		championNameInput.style.backgroundImage = ""
 		return
 	}
 	
@@ -82,9 +85,11 @@ function validateChampion() {
 			championIdSpan.innerHTML = "❓" // question mark for unsure
 		championNameInput.value = champions[mostSimilarId].name
 		championId = champions[mostSimilarId].id
+		championNameInput.style.backgroundImage = "url(http://ddragon.leagueoflegends.com/cdn/"+latestVersion+"/img/champion/"+champions[mostSimilarId].key+".png)"
 	} else {
 		championIdSpan.innerHTML = "❌" // cross mark for error
 		championId = null
+		championNameInput.style.backgroundImage = ""
 	}
 }
 
@@ -94,10 +99,13 @@ usernameInput.addEventListener("change", validateUsername)
 function validateUsername() {
 		userIdSpan.innerHTML = ""
 		user = null
+		usernameInput.style.backgroundImage = ""
+		
 	if (!usernameInput.value) {
 		socket.off("summoner") // makes sure delayed responses don't overwrite empty innerHTML
 		return
 	}
+	
 	userIdSpan.innerHTML = "⏳" // hourglass symbol for loading
 	
 	socket.emit("summoner", {
@@ -113,6 +121,7 @@ function expectSummonerMessage() {
 			user = msg[usernameInput.value.toLowerCase().split(" ").join("")]
 			usernameInput.value = user.name
 			userIdSpan.innerHTML = "✔" // check mark for success
+			usernameInput.style.backgroundImage = "url(http://ddragon.leagueoflegends.com/cdn/"+latestVersion+"/img/profileicon/"+user.profileIconId+".png)"
 		}
 		else userIdSpan.innerHTML = "❌" // cross mark for error
 	})
