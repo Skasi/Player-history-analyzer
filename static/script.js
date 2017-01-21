@@ -233,7 +233,7 @@ form.onsubmit = function() {
 		
 		//! TODO: Add support for sorting.
 		// TODO: Perhaps namelist should be a second parameter added to new StatCategory; though lists like items and champions might update after a StatCategory was constructed
-		toTable(nameList, minimum = 0) {
+		toTable(nameList, minimum = 1) {
 			var tbodyContent = ""
 			var tfoot = ""
 			// Variable used to verify if anything will be hidden at all
