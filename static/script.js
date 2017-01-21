@@ -509,7 +509,8 @@ form.onsubmit = function() {
 		for (var i = 0; i < maxLength; i++) {
 			var w = winGameLengths[i] || 0
 			var l = lossGameLengths[i] || 0
-			maxGames = Math.max(w, l, maxGames)
+			var r = remakeGameLengths[i] || 0
+			maxGames = Math.max(w, l, r, maxGames)
 		}
 		maxGames += 3 // Add some blank space above
 		// TODO: replace y height stuff
