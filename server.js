@@ -30,7 +30,7 @@ SERVER SENT RETRY-AFTER FOR A TOTAL OF 8 TIMES NOW
 Retrying after 513000 ms
 
 TODO:
-Remember match histories for players. Only use these cached histories if riot servers are unresponsive.
+Remember match histories for players. Only use these cached histories if riot servers are unresponsive. Remember the longest and most recent match histories, then pick whichever has sufficient data.
 TODO:
 Deal with matches that were sent before a user made a new request but are recieved after this request. (done via socket.once and similar?)
 Make queues per-region for expected 2x speed on high usage.

@@ -1,10 +1,16 @@
 "use strict"
 
+// TODO: Fix match history urls. eg. EUNE1 -> EUN1
+// TODO: Show LOADING animation while script is running.
+
+// TODO: Offer table with actual matchlist. (optional: let users filter matches by champion/item occurance)
+// But also make summoner names (and maybe player-champions) clickable. Clicking them inserts their values into the appropriate input fields so that a user can then search with these parameters.
+
 // TODO: Add support for search parameters in url
 // TODO: Show more player stats. Division, etc.
 // TODO: Redo how tables are drawn. Merge tablesort into the system.
+// TODO: Improve sorting performance for massive (2000+) lists.
 // TODO: Redo "click to reveal": Don't hide items if only 1-4 would be hidden in the first place.
-// TODO: Make summoner names (and maybe player-champions) clickable. Clicking them inserts their values into the appropriate input fields so that a user can then search with these parameters.
 // TODO: Remember matches between requests so that server doesn't have to send the same matches again on next request. (Server might want to keep recent games in memory too)
 
 
