@@ -7,6 +7,24 @@
 // TODO: Make summoner names (and maybe player-champions) clickable. Clicking them inserts their values into the appropriate input fields so that a user can then search with these parameters.
 // TODO: Remember matches between requests so that server doesn't have to send the same matches again on next request. (Server might want to keep recent games in memory too)
 
+
+// Platform IDs taken from https://developer.riotgames.com/docs/regional-endpoints
+var platforms = {
+	br:  "BR1",
+	eune:"EUN1",
+	euw: "EUW1",
+	jp:  "JP1",
+	kr:  "KR",
+	lan: "LA1",
+	las: "LA2",
+	na:  "NA1",
+	oce: "OC1",
+	tr:  "TR1",
+	ru:  "RU",
+	pbe: "PBE1"
+}
+
+
 // Get HTML elements by ID for use in JS
 var form = document.getElementById("form")
 
@@ -85,7 +103,7 @@ function validateChampion() {
 			championIdSpan.innerHTML = "❓" // question mark for unsure
 		championNameInput.value = champions[mostSimilarId].name
 		championId = champions[mostSimilarId].id
-		championNameInput.style.backgroundImage = "url(http://ddragon.leagueoflegends.com/cdn/"+latestVersion+"/img/champion/"+champions[mostSimilarId].key+".png)"
+		championNameInput.style.backgroundImage = "url(https://ddragon.leagueoflegends.com/cdn/"+latestVersion+"/img/champion/"+champions[mostSimilarId].key+".png)"
 	} else {
 		championIdSpan.innerHTML = "❌" // cross mark for error
 		championId = null
@@ -121,7 +139,7 @@ function expectSummonerMessage() {
 			user = msg[usernameInput.value.toLowerCase().split(" ").join("")]
 			usernameInput.value = user.name
 			userIdSpan.innerHTML = "✔" // check mark for success
-			usernameInput.style.backgroundImage = "url(http://ddragon.leagueoflegends.com/cdn/"+latestVersion+"/img/profileicon/"+user.profileIconId+".png)"
+			usernameInput.style.backgroundImage = "url(https://ddragon.leagueoflegends.com/cdn/"+latestVersion+"/img/profileicon/"+user.profileIconId+".png)"
 		}
 		else userIdSpan.innerHTML = "❌" // cross mark for error
 	})
@@ -489,7 +507,7 @@ form.onsubmit = function() {
 		
 		var otherStats = "<span>Average KDA</span>: "+(Math.ceil(totalKills/progress*100)/100)+"/"+(Math.ceil(totalDeaths/progress*100)/100)+"/"+(Math.ceil(totalAssists/progress*100)/100)+"</span><br>"+
 			"<span title='( Kills + Assists ) / ( Deaths ), where Deaths of 0 are replaced by 0.75'>Best KDA</span>: "+bestKDAstats+
-			" (<a href=http://matchhistory."+region+".leagueoflegends.com/en/#match-details/"+region.toUpperCase()+"1/"+bestKDAmatchID+">match</a>)"
+			" (<a href=http://matchhistory."+region+".leagueoflegends.com/en/#match-details/"+platforms[region]+"/"+bestKDAmatchID+">match</a>)"
 		
 		// Draw progress info
 		dataDiv.innerHTML = outputProgress + outputTotalsTable + otherStats
