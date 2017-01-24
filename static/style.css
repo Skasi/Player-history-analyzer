@@ -97,7 +97,7 @@ table {
 .sortable th:hover {
 	outline: #fff solid 2px; 
 }
-.sorttable_sorted, .sorttable_sorted_reverse {
+th.sorttable_sorted, th.sorttable_sorted_reverse {
 	background: #000; /* For browsers that do not support gradients */
 	background:         linear-gradient(#aaa, #fff); /* Standard syntax */
 	background:      -o-linear-gradient(#aaa, #fff); /* Opera 11.6 to 12.0 */
