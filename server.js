@@ -369,7 +369,9 @@ function queueSummoner(socket, data, queueWithMatchlist) {
 				// optional callback for queuing matchlist
 				if (queueWithMatchlist) {
 					// get requested summoner's id
-					var summonerId = summonerData[data.username.toLowerCase().replace(/%20/g, "")].id
+					var summonerId
+					for (var k in summonerData)
+						summonerId = summonerData[k].id
 					
 					// prepare matchlist url
 					var matchlistUrl = "https://"+data.region+".api.pvp.net/api/lol/"+data.region+"/v2.2/matchlist/by-summoner/"+summonerId+"?championIds="+(data.championId || "")+"&beginTime="+(data.beginTime || "")+"&endTime="+(data.endTime || "")+"&beginIndex="+(data.beginIndex || 0)+"&endIndex="+(data.endIndex || 100)
