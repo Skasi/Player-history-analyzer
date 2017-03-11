@@ -423,7 +423,8 @@ function queueMatchlist(socket, matchlistUrl, data) {
 				
 				for (var i = 0; i < matchlistData.matches.length; i++) {
 					var match = matchlistData.matches[i]
-					var matchUrl = "https://"+data.region+".api.pvp.net/api/lol/"+data.region+"/v2.2/match/"+match.matchId+"?includeTimeline=true"
+					match.region = match.region.toLowerCase()
+					var matchUrl = "https://"+match.region+".api.pvp.net/api/lol/"+match.region+"/v2.2/match/"+match.matchId+"?includeTimeline=true"
 					
 					queueMatch(socket, matchUrl)
 				}
