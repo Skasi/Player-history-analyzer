@@ -5,4 +5,4 @@ returns all kinds of statistics.
 
 Currently runs on https://skasilab.pixelminers.net/
 
-![Website in use](http://i.imgur.com/NQvhBtG.png)
+![Website in use](http://i.imgur.com/v3aEVy3.png)
