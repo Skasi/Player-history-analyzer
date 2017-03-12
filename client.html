@@ -64,9 +64,11 @@
 				<label>Username*: <input id="username" required /><span id="userId"></span></label><br>
 				<label>Champion: <input id="championName" /><span id="championId"></span></label><br><!-- TODO: Turn into dropdown list and get champion ID by name; OR: turn into name input field and look for name in champion list; also after username is entered, get a list of all champions that player used in rankeds -->
 				<!-- TODO: Put the last two input fields into some sort of "advanced settings" menu to keep the base tool simple -->
-				Game age: <input id="minAge" size="3" /> to <input id="maxAge" size="3" /> days<br> <!-- TODO: Add :active tooltip showing days since each patch -->
-				Games*: <input id="beginIndex" size="3" value="0" required /> to <input id="endIndex" size="3" value="100" required /><br>
 				<input type="submit" id="submit" value="Retrieve data" /><span id="matchlistInfo"></span>
+				<div class="transparent">
+					Game age: <input id="minAge" size="3" /> to <input id="maxAge" size="3" /> days<br> <!-- TODO: Add :active tooltip showing days since each patch -->
+					Games*: <input id="beginIndex" size="3" value="0" required /> to <input id="endIndex" size="3" value="100" required />
+				</div>
 			</form>
 		</div>
 		<div id="data"></div>

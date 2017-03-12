@@ -34,6 +34,10 @@ body {
 	background-attachment: fixed;
 }
 
+.transparent {
+	opacity: 0.6;
+}
+
 /* Fix crazy emoji line height on mobile (Android) */
 span {
 	line-height: 1em;
