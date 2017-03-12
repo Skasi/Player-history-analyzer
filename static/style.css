@@ -91,7 +91,9 @@ table {
 	border-radius: 12px;
 }
 
-.belowMinimum {
+.belowMinimum,
+.filter-only-completed tbody tr.filter-into, .filter-only-completed tbody tr:not(.filter-from)
+{
 	display: none;
 }
 .showAll .belowMinimum {

@@ -1,6 +1,9 @@
 "use strict"
 
 // TODO: Fix match history urls. eg. EUNE1 -> EUN1
+// TODO: Put filter buttons into a mouseover-expandable menu above each table
+// TODO: Turn belowMinimum into a toggle-able filter
+
 // TODO: Show LOADING animation while script is running.
 
 // TODO: Offer table with actual matchlist. (optional: let users filter matches by champion/item occurance)
@@ -239,7 +242,8 @@ form.onsubmit = function() {
 		
 		//! TODO: Add support for sorting.
 		// TODO: Perhaps namelist should be a second parameter added to new StatCategory; though lists like items and champions might update after a StatCategory was constructed
-		toTable(nameList, minimum = 1) {
+		toTable(id, nameList, minimum = 1) {
+			var filters = ""
 			var tbodyContent = ""
 			var tfoot = ""
 			// Variable used to verify if anything will be hidden at all
@@ -250,21 +254,29 @@ form.onsubmit = function() {
 				// Check for occurences below <minimum> (optional parameter)
 				if (this.list[key].win + this.list[key].loss < minimum) {
 					itemsBelowMinimum++
-					classAttribute = "belowMinimum"
+					classAttribute = "belowMinimum "
 				}
 				else
 					classAttribute = ""
 				
+				// Prepare variables for table
 				var win = (this.list[key].win || "")
 				var loss = (this.list[key].loss || "")
 				var name
 				if (nameList && nameList[key]) name = nameList[key].name || nameList[key]
 				else name = "N/A: " + key
 				
-				// Special case for enchanted jungler items. These names only contain the enchantment name, they are missing the actual jungle item that was enchanted. Here I add the actual item name before the enchantment. The actual item name is gained by via the id the last (hopefully that wont change) entry in the "from" array.
-				if (name.includes("Enchantment")) name = nameList[nameList[key].from[nameList[key].from.length - 1]].name + " " + name
+				// Special case for enchanted jungler items. These names only contain the enchantment name, they are missing the actual jungle item that was enchanted. Here I add the actual item name before the enchantment. The actual item name is gained via the id of the last (hopefully that wont change) entry in the "from" array.
+				if (name.includes("Enchantment"))
+					name = nameList[nameList[key].from[nameList[key].from.length - 1]].name + " " + name
 				
-				tbodyContent += "<tr class=" + classAttribute + ">"
+				// Prepare classes for filters
+				if (nameList[key].into)
+					classAttribute += "filter-into "
+				if (nameList[key].from)
+					classAttribute += "filter-from "
+				
+				tbodyContent += "<tr class='" + classAttribute + "'>"
 				/* Name   */  + '<td class=statName title="' + name + '"><span>' + name + "</span></td>"
 				/* Sum    */  + "<td class=statNumber><span>" + (win+loss) + "</span></td>"
 				/* Wins   */  + "<td class=statNumber><span>" + win + "</span></td>"
@@ -273,10 +285,15 @@ form.onsubmit = function() {
 				/* Score  */  + "<td class=statNumber><span>" + Math.floor(computeRating(win, loss)*100 + 0.5)/100 + "</span></td>"
 				              + "</tr>"
 			}
+			
+			if (id.includes("items")) {
+				filters += "<label><input type=checkbox class=filter data-filter=filter-only-completed data-target='"+id+"' disabled>Only completed items</label>"
+			}
+			
 			if (tbodyContent.length > 0 || itemsBelowMinimum) { // low-TODO: There can be very special cases in which all content is hidden. Is that okay?
 				if (itemsBelowMinimum)
-					tfoot += "<tfoot onclick=reveal(this)><tr><td class=revealButton colspan=6 title='rows were hidden because their occurance was below " + minimum + "'>" + itemsBelowMinimum + " rows hidden - click to reveal</td></tr></tfoot>" //!! TODO: Add clickeventlistener
-				return "<table class=notYetSortable>" + toHead(this.title) + "<tbody>" + tbodyContent + "</tbody>" + tfoot + "</table>"
+					tfoot += "<tfoot onclick=reveal(this)><tr><td class=revealButton colspan=6 title='rows were hidden because their occurance was below " + minimum + "'>" + itemsBelowMinimum + " rows hidden - click to reveal</td></tr></tfoot>"
+				return "<div class=statCategory id='"+id+"'><div class=filterList>" + filters + "</div><table class=notYetSortable>" + toHead(this.title) + "<tbody>" + tbodyContent + "</tbody>" + tfoot + "</table></div>"
 			} else
 				return "<table><thead><tr><th>"+this.title+"</th></tr></thead></table>"
 		}
@@ -635,15 +652,15 @@ form.onsubmit = function() {
 		// TODO: Make 2nd parameters depend on table's length instead of wins+losses
 		// TODO: Ally- and Enemy items are less interesting and should be more hidden
 		resultDiv.innerHTML = "<div>"+
-									 playerChampions.toTable(champions)+
-									 allySummoners.toTable  (summoners, minBattlesForSummoners)+
-									 enemySummoners.toTable (summoners, minBattlesForSummoners)+
+									 playerChampions.toTable("playerchampions", champions)+
+									 allySummoners.toTable  ("allysummoners",  summoners, minBattlesForSummoners)+
+									 enemySummoners.toTable ("enemysummoners", summoners, minBattlesForSummoners)+
 									 "</div>"+
-									 allyChampions.toTable  (champions, minSum)+
-									 enemyChampions.toTable (champions, minSum)+
-									 playerItems.toTable(items)+
-									 allyItems.toTable  (items, minSum)+
-									 enemyItems.toTable (items, minSum)
+									 allyChampions.toTable  ("allychampions",  champions, minSum)+
+									 enemyChampions.toTable ("enemychampions", champions, minSum)+
+									 playerItems.toTable("playeritems", items)+
+									 allyItems.toTable  ("allyitems",   items, minSum * 2)+
+									 enemyItems.toTable ("enemyitems",  items, minSum * 2)
 									 
 		// playerFinalItems.toTable(items,2)
 		// allyFinalItems.toTable  (items,2)
@@ -712,6 +729,14 @@ function stop() {
 	while (notYetSortable.length > 0) {
 		notYetSortable[0].className = notYetSortable[0].className.replace("notYetSortable", "sortable")
 	}
+	var filterButtons = document.querySelectorAll(".filter")
+	for (var i=0; i<filterButtons.length; i++) {
+		filterButtons[i].disabled = false
+		filterButtons[i].onclick = function() {
+			document.getElementById(this.dataset.target).classList.toggle(this.dataset.filter)
+		}
+	}
+	
 	// Initialize sorttable
 	sorttable.init()
 	// Add class to render tables in columns
