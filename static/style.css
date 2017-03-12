@@ -5,10 +5,20 @@ bugreport: https://bugs.chromium.org/p/chromium/issues/detail?id=46543
 Bring back :hover showing overflow.
 
 Somehow get the website to display on mobile properly and performance-efficient. SVG causing problems on some low-end devices.
+
+
+
+COLORS:
+
+23, 49, 61: or #134 dark teal used in client
+98, 141, 149: or ~ #689 bright teal (background, borders)
+
+218, 172, 26: or ~ #da2 golden text color (text, border)
+215, 196, 164: or ~ #dc9 white-beige (text, or highlighting gold)
 */
 
 * {
-	color: #eee;
+	color: #dc9;
 }
 
 html, body {
@@ -17,10 +27,10 @@ html, body {
 }
 body {
 	background: #000; /* For browsers that do not support gradients */
-	background:         radial-gradient(circle, #335, #000); /* Standard syntax */
-	background:      -o-radial-gradient(circle, #335, #000); /* Opera 11.6 to 12.0 */
-	background:    -moz-radial-gradient(circle, #335, #000); /* Firefox 3.6 to 15 */
-	background: -webkit-radial-gradient(circle, #335, #000); /* Safari */
+	background:         radial-gradient(circle, #134, #000); /* Standard syntax */
+	background:      -o-radial-gradient(circle, #134, #000); /* Opera 11.6 to 12.0 */
+	background:    -moz-radial-gradient(circle, #134, #000); /* Firefox 3.6 to 15 */
+	background: -webkit-radial-gradient(circle, #134, #000); /* Safari */
 	background-attachment: fixed;
 }
 
@@ -74,6 +84,7 @@ svg:empty {
 table {
 	margin: 0 0 1em;
 	border: 1px solid #888;
+	border-radius: 12px;
 }
 
 .belowMinimum {
@@ -85,24 +96,24 @@ table {
 
 .notYetSortable th, .sortable th {
 	background: #000; /* For browsers that do not support gradients */
-	background:         linear-gradient(#fff, #aaa); /* Standard syntax */
-	background:      -o-linear-gradient(#fff, #aaa); /* Opera 11.6 to 12.0 */
-	background:    -moz-linear-gradient(#fff, #aaa); /* Firefox 3.6 to 15 */
-	background: -webkit-linear-gradient(#fff, #aaa); /* Safari */
+	background:         linear-gradient(#dc9, #aaa); /* Standard syntax */
+	background:      -o-linear-gradient(#dc9, #aaa); /* Opera 11.6 to 12.0 */
+	background:    -moz-linear-gradient(#dc9, #aaa); /* Firefox 3.6 to 15 */
+	background: -webkit-linear-gradient(#dc9, #aaa); /* Safari */
 }
 
 .sortable th, .revealButton {
 	cursor: pointer !important; /* override help-pointers from [title] and similar */
 }
 .sortable th:hover {
-	outline: #fff solid 2px; 
+	box-shadow: 0 0 0 2px #fff;
 }
 th.sorttable_sorted, th.sorttable_sorted_reverse {
 	background: #000; /* For browsers that do not support gradients */
-	background:         linear-gradient(#aaa, #fff); /* Standard syntax */
-	background:      -o-linear-gradient(#aaa, #fff); /* Opera 11.6 to 12.0 */
-	background:    -moz-linear-gradient(#aaa, #fff); /* Firefox 3.6 to 15 */
-	background: -webkit-linear-gradient(#aaa, #fff); /* Safari */
+	background:         linear-gradient(#aaa, #dc9); /* Standard syntax */
+	background:      -o-linear-gradient(#aaa, #dc9); /* Opera 11.6 to 12.0 */
+	background:    -moz-linear-gradient(#aaa, #dc9); /* Firefox 3.6 to 15 */
+	background: -webkit-linear-gradient(#aaa, #dc9); /* Safari */
 }
 .sortable th.sorttable_sorted:before { 
 	 content: "\25B4";
@@ -154,6 +165,12 @@ th {
 	background-color: #ccc;
 	color: #000;
 }
+th:first-child {
+	border-radius: 8px 0 0 0;
+}
+th:last-child {
+	border-radius: 0 8px 0 0;
+}
 th>div {
 	color: inherit;
 	background-color: transparent;
@@ -165,7 +182,7 @@ th>div {
 	margin: 0 0 2.5ex calc(50% - 0.625em);
 }
 td:nth-child(2n) {
-	background-color: #444;
+	background-color: #134;
 }
 td:nth-child(2n+1) {
 	background-color: #000;
