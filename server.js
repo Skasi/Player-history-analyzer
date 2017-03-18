@@ -19,27 +19,25 @@ example:
 console.log("\x1b[7mInitializing server..\x1b[0m")
 */
 
-
 /*
-HIGH-TODO:
-Apparently at very high request speeds (4ms timeout), retry-afters are not handled properly and can be skipped! ISSUE PROBABLY CAUSED BECAUSE MULTIPLE REQUESTS ARE HAPPENING AT THE SAME TIME AND IF THE FIRST OF THEM LEADS TO A RETRY-AFTER THEN THE FOLLOWING ONES WILL TOO!
-REQUEST ERROR for match
- https://euw.api.pvp.net/api/lol/euw/v2.2/match/2966806556?includeTimeline=true response:
- 429
-SERVER SENT RETRY-AFTER FOR A TOTAL OF 8 TIMES NOW
-Retrying after 513000 ms
-
-TODO:
-Remember match histories for players. Only use these cached histories if riot servers are unresponsive. Remember the longest and most recent match histories, then pick whichever has sufficient data.
-TODO:
-Deal with matches that were sent before a user made a new request but are recieved after this request. (done via socket.once and similar?)
-Make queues per-region for expected 2x speed on high usage.
+TODO: Add some sort of intervall to update items and champions every now and then for when new stuff is released - don't forget to reset: items = {}
+TODO (fallback): Remember match histories for players. Only use these cached histories if riot servers are unresponsive. Remember the longest and most recent match histories, then pick whichever has sufficient data.
+TODO: Theoretically users might be able to send 10000 single requests and could cause the queue to never start a timeout.
+TODO: list of users needs to be split up in FIRST-TIMERS and OLD REQUESTERS
+newcommers will be added at the END of the FIRST-TIMERS queue
+FIRST-TIMERS will come BEFORE the group of OLD REQUESTERS
+TODO: Consider if newcommers should have to wait until OLD REQUESTERS are complete.
+Also consider giving OLD REQUESTERS with few requests a slightly higher priority over those with many requests.
+This might be obsolete though as those with few requests are completed sooner anyway.
+Just make sure that people can not somehow completely block other people by filling up the queue like crazy.
+TODO (performance): Make queues per-region for expected 2x speed on high usage.
+TODO (performance): To improve the speed for users, have a separate queue for DB and API requests. Only add requests to the API queue if they are not in DB. Request all matches in a single batch and only add them to the API request queue if a match is not available.
+TODO (done?): Deal with matches that were sent before a user made a new request but are recieved after this request. (done via socket.once and similar?)
 */
 
 console.log("\x1b[7mInitializing server..\x1b[0m")
 
 // INITIALIZE SERVER STUFF
-//console.log(this)
 
 // server libs
 var express = require("express")
@@ -54,12 +52,8 @@ var semver = require('semver') // Used to compare API's version numbering for it
 var apiKey = require("./APIKEY") // File storing the API key
 var config = require("./config") // Different configuration variables
 
-// listen to port
-if (process.env.PORT) {
-	server.listen(parseInt(process.env.PORT))
-} else {
-	server.listen(80)
-}
+// Initialize database for matches
+var matchDB = levelup('./matchDB')
 
 // Set "default entry" directory to /static/
 app.use(express.static("static"))
@@ -68,17 +62,18 @@ app.get("/", function (req, res) {
 	res.sendFile(__dirname + "/client.html")
 })
 
-// Initialize database for matches
-var matchDB = levelup('./matchDB')
-
+// listen to port
+if (process.env.PORT) {
+	server.listen(parseInt(process.env.PORT))
+} else {
+	server.listen(80)
+}
 
 // Counters
 var retryAfters = 0
 
 // API REQUEST FUNCTION
 // converts a "simple" request to a more precise request for the request library
-// TODO: To improve the speed for users, have a separate queue for DB and API requests. Only add requests to the API queue if they are not in DB.
-// TODO: In the above case, request all matches in a single batch and only add them to the API request queue if a match is not available.
 function request(db, url, action) {
 	var config = {
 		url: url+"&api_key="+apiKey,
@@ -104,7 +99,6 @@ function request(db, url, action) {
 					
 					if (response && response.statusCode === 200) {
 						// Store data in DB
-						// TODO: Can improve performance by using "response.body" or whatever it's called - that's already stringified
 						console.log("Storing data to DB:", url)
 						db.put(url, JSON.stringify(body), (putError) => {
 							if (putError)
@@ -117,7 +111,6 @@ function request(db, url, action) {
 			}
 			
 			// If data was in DB, then don't wait 1s before requesting the next thing
-			// TODO: Consider if using retryAfter for this is clean enough, it felt slightly wrong
 			requestQueue.retryAfter(0)
 			
 			action(dbError, null, JSON.parse(value))
@@ -142,16 +135,7 @@ function retryHandler(response) {
 	}
 }
 
-/*
-TODO: list of users needs to be split up in FIRST-TIMERS and OLD REQUESTERS
-newcommers will be added at the END of the FIRST-TIMERS queue
-FIRST-TIMERS will come BEFORE the group of OLD REQUESTERS
-TODO: Consider if newcommers should have to wait until OLD REQUESTERS are complete.
-Also consider giving OLD REQUESTERS with few requests a slightly higher priority over those with many requests.
-This might be obsolete though as those with few requests are completed sooner anyway.
-Just make sure that people can not somehow completely block other people by filling up the queue like crazy.
-*/
-// TODO: Theoretically users might be able to send 10000 single requests and could cause the queue to never start a timeout.
+// A queue of user requests that will potentially be forwarded to riot servers.
 class Queue {
 	constructor(/*region for a later version*/) {
 		// region for a later version
@@ -234,14 +218,11 @@ class Queue {
 		else
 			this.users.unshift({socket: socket, pending: [requestOrder]})
 		
-		//console.log("u:", u)
-		//console.log("this.users:", this.users)
 		this.start()
 	}
 	
 	// add request to end of specified socket's list of requestOrders
 	append(socket, requestOrder) {
-		//console.log("appending request:", requestOrder.url)
 		var u = this.users.find(u => u.socket === socket)
 		// user exists, add order to end
 		if (u)
@@ -250,8 +231,6 @@ class Queue {
 		else
 			this.users.unshift({socket: socket, pending: [requestOrder]})
 		
-		//console.log("u:", u)
-		//console.log("this.users:", this.users)
 		this.start()
 	}
 	
@@ -260,7 +239,6 @@ class Queue {
 		this.users = this.users.filter(u => u.socket !== socket)
 	}
 }
-
 
 var requestQueue = new Queue()
 
@@ -375,8 +353,7 @@ function queueSummoner(socket, data, queueWithMatchlist) {
 					
 					// prepare matchlist url
 					var matchlistUrl = "https://"+data.region+".api.pvp.net/api/lol/"+data.region+"/v2.2/matchlist/by-summoner/"+summonerId+"?championIds="+(data.championId || "")+"&beginTime="+(data.beginTime || "")+"&endTime="+(data.endTime || "")+"&beginIndex="+(data.beginIndex || 0)+"&endIndex="+(data.endIndex || 100)
-					
-					queueMatchlist(socket, matchlistUrl, data)
+					queueMatchlist(socket, matchlistUrl)
 				}
 			}
 		}
@@ -384,7 +361,7 @@ function queueSummoner(socket, data, queueWithMatchlist) {
 }
 
 // function to call itself for retries
-function queueMatchlist(socket, matchlistUrl, data) {
+function queueMatchlist(socket, matchlistUrl) {
 	console.log("adding request for matchlist to queue, url:\n", matchlistUrl)
 	requestQueue.append(
 		socket,
@@ -424,8 +401,9 @@ function queueMatchlist(socket, matchlistUrl, data) {
 				for (var i = 0; i < matchlistData.matches.length; i++) {
 					var match = matchlistData.matches[i]
 					match.region = match.region.toLowerCase()
-					var matchUrl = "https://"+match.region+".api.pvp.net/api/lol/"+match.region+"/v2.2/match/"+match.matchId+"?includeTimeline=true"
 					
+					// prepare match url
+					var matchUrl = "https://"+match.region+".api.pvp.net/api/lol/"+match.region+"/v2.2/match/"+match.matchId+"?includeTimeline=true"
 					queueMatch(socket, matchUrl)
 				}
 			}
@@ -463,7 +441,6 @@ function queueMatch(socket, matchUrl) {
 
 // GET STATIC DATA FROM RITO ONCE
 
-// TODO: Change item- and champion info's request() to requestQueue // necessary?
 
 // Item info
 var items = {}
@@ -531,8 +508,6 @@ function requestVersions(url) {
 // Request game versions to then be able to request items for the different game versions
 requestVersions("https://global.api.pvp.net/api/lol/static-data/NA/v1.2/versions?")
 requestChampion("https://global.api.pvp.net/api/lol/static-data/NA/v1.2/champion?locale=en_US&dataById=true")
-// TODO: Add some sort of intervall to update items and champions every now and then for when new stuff is released - don't forget to reset: items = {}
-
 
 
 // Handle shutdown command

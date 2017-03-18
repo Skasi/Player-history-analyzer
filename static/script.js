@@ -1,6 +1,5 @@
 "use strict"
 
-// TODO: Fix match history urls. eg. EUNE1 -> EUN1
 // TODO: Put filter buttons into a mouseover-expandable menu above each table
 // TODO: Turn belowMinimum into a toggle-able filter
 
@@ -189,7 +188,6 @@ form.onsubmit = function() {
 		return false
 	}
 	
-	// TODO: Consider move champion and item data into some static file so it doesn't need to be sent via socket.
 	//	TODO: Create dropdown menu with automated filtering on champ name string input
 	
 	// maxAge -> beginTime
@@ -205,7 +203,7 @@ form.onsubmit = function() {
 		endTime = d.getTime()
 	}
 	
-	// Socket io magic
+	// Socket io
 	// TODO: Consider some "socket.offAll()" or whatever the function is called - pretty sure it already exists
 	socket.off("match")
 	socket.off("warning")
@@ -241,7 +239,6 @@ form.onsubmit = function() {
 		}
 		
 		//! TODO: Add support for sorting.
-		// TODO: Perhaps namelist should be a second parameter added to new StatCategory; though lists like items and champions might update after a StatCategory was constructed
 		toTable(id, nameList, minimum = 1) {
 			var filters = ""
 			var tbodyContent = ""
@@ -426,6 +423,8 @@ form.onsubmit = function() {
 					var participant = matchData.participants[pId]
 					var player = matchData.participantIdentities[pId].player
 					
+					// TODO: Check for ITEM_DESTROYED of Archangel's Staff, Manamune (and more?) to find out when Seraph's Embrace, Muramana, etc. were created
+						
 					// player
 					if (player.summonerId == user.id) {
 						if (type === "ITEM_PURCHASED") playerItems.increase(event.itemId, win)
@@ -487,9 +486,10 @@ form.onsubmit = function() {
 						allyFinalItems.increase(participant.stats["item"+n], win)
 				}
 			}
-			// TODO: Track W/L for player's skill orders
+			// TODO: Advanced - track W/L for player's skill orders
 			// TODO: Track picks and bans
 			// TODO: Track keystones (and maybe other masteries)
+			// TODO: Track summoner spells
 			// TODO: Track player's kills/deaths to enemy champions
 			// TODO: Track champion's red and blue -top/-mid/-bot/-jungle/-supp wins/deaths for super overkill detailed stats
 			// TODO: Very advanced - track "comeback items" vs "expand lead items" that lead to win when bought while (far) behind/ahead
@@ -729,6 +729,7 @@ function stop() {
 	while (notYetSortable.length > 0) {
 		notYetSortable[0].className = notYetSortable[0].className.replace("notYetSortable", "sortable")
 	}
+	
 	var filterButtons = document.querySelectorAll(".filter")
 	for (var i=0; i<filterButtons.length; i++) {
 		filterButtons[i].disabled = false
