@@ -32,6 +32,16 @@ var platforms = {
 	pbe: "PBE1"
 }
 
+var monsters = {
+	AIR_DRAGON:   "Cloud Drake",
+	BARON_NASHOR: "Baron Nashor",
+	EARTH_DRAGON: "Mountain Drake",
+	ELDER_DRAGON: "Elder Dragon",
+	FIRE_DRAGON:  "Infernal Drake",
+	RIFTHERALD:   "Rift Herald",
+	WATER_DRAGON: "Ocean Drake"
+}
+
 
 // Get HTML elements by ID for use in JS
 var form = document.getElementById("form")
@@ -268,9 +278,9 @@ form.onsubmit = function() {
 					name = nameList[nameList[key].from[nameList[key].from.length - 1]].name + " " + name
 				
 				// Prepare classes for filters
-				if (nameList[key].into)
+				if (nameList && nameList[key].into)
 					classAttribute += "filter-into "
-				if (nameList[key].from)
+				if (nameList && nameList[key].from)
 					classAttribute += "filter-from "
 				
 				tbodyContent += "<tr class='" + classAttribute + "'>"
@@ -283,7 +293,7 @@ form.onsubmit = function() {
 				              + "</tr>"
 			}
 			
-			if (id.includes("items")) {
+			if (id && id.includes("items")) {
 				filters += "<label><input type=checkbox class=filter data-filter=filter-only-completed data-target='"+id+"' disabled>Only completed items</label>"
 			}
 			
@@ -314,6 +324,9 @@ form.onsubmit = function() {
 	var playerItems = new StatCategory("PLAYER<br>ITEMS")
 	var   allyItems = new StatCategory("ALLIED<br>ITEMS")
 	var  enemyItems = new StatCategory("ENEMY<br>ITEMS")
+	
+	var  allyMonsterKills = new StatCategory("ALLIED<br>MONSTER KILLS")
+	var enemyMonsterKills = new StatCategory("ENEMY<br>MONSTER KILLS")
 	
 	//game durations for SVG graph
 	var totalWinDuration = 0
@@ -410,40 +423,50 @@ form.onsubmit = function() {
 				
 				for (var eventId in frame.events) {
 					var event = frame.events[eventId]
-					var type = event.eventType
+					var eventType = event.eventType
 					
 					// event.participantId begins counting at 1
 					// arrays matchData.participants and matchData.participantIdentities begin at 0
 					var pId = event.participantId - 1
 					
 					// If event doesn't have to do with items, skip it
-					if (type.indexOf("ITEM") == -1 || pId < 0)
-						continue
-					
-					var participant = matchData.participants[pId]
-					var player = matchData.participantIdentities[pId].player
-					
-					// TODO: Check for ITEM_DESTROYED of Archangel's Staff, Manamune (and more?) to find out when Seraph's Embrace, Muramana, etc. were created
+					if (eventType.indexOf("ITEM") != -1 && pId >= 0) {
+						var participant = matchData.participants[pId]
+						var player = matchData.participantIdentities[pId].player
 						
-					// player
-					if (player.summonerId == user.id) {
-						if (type === "ITEM_PURCHASED") playerItems.increase(event.itemId, win)
-						// decrease item on mispurchase, ignore itemBefore with id 0 (which happens when undoing a sell)
-						else if (type === "ITEM_UNDO" && event.itemBefore > 0) playerItems.decrease(event.itemBefore, win)
+						// TODO: Check for ITEM_DESTROYED of Archangel's Staff, Manamune (and more?) to find out when Seraph's Embrace, Muramana, etc. were created
+							
+						// player
+						if (player.summonerId == user.id) {
+							if (eventType === "ITEM_PURCHASED") playerItems.increase(event.itemId, win)
+							// decrease item on mispurchase, ignore itemBefore with id 0 (which happens when undoing a sell)
+							else if (eventType === "ITEM_UNDO" && event.itemBefore > 0) playerItems.decrease(event.itemBefore, win)
+							
+						// enemies
+						} else if (participant.teamId != playerTeam) {
+							if (eventType === "ITEM_PURCHASED") enemyItems.increase(event.itemId, win)
+							// decrease item on mispurchase, ignore itemBefore with id 0 (which happens when undoing a sell)
+							else if (eventType === "ITEM_UNDO" && event.itemBefore > 0) enemyItems.decrease(event.itemBefore, win)
+							
+						// allies
+						} else {
+							if (eventType === "ITEM_PURCHASED") allyItems.increase(event.itemId, win)
+							// decrease item on mispurchase, ignore itemBefore with id 0 (which happens when undoing a sell)
+							else if (eventType === "ITEM_UNDO" && event.itemBefore > 0) allyItems.decrease(event.itemBefore, win)
 						
-					// enemies
-					} else if (participant.teamId != playerTeam) {
-						if (type === "ITEM_PURCHASED") enemyItems.increase(event.itemId, win)
-						// decrease item on mispurchase, ignore itemBefore with id 0 (which happens when undoing a sell)
-						else if (type === "ITEM_UNDO" && event.itemBefore > 0) enemyItems.decrease(event.itemBefore, win)
-						
-					// allies
-					} else {
-						if (type === "ITEM_PURCHASED") allyItems.increase(event.itemId, win)
-						// decrease item on mispurchase, ignore itemBefore with id 0 (which happens when undoing a sell)
-						else if (type === "ITEM_UNDO" && event.itemBefore > 0) allyItems.decrease(event.itemBefore, win)
-					
+						}
 					}
+					// Count monsters killed (including CS and jungles?)
+					else if (eventType === ("ELITE_MONSTER_KILL")) {
+						if (event.monsterSubType)
+							var monster = event.monsterSubType
+						else
+							var monster = event.monsterType
+						
+						if (matchData.participants[event.killerId-1].teamId == playerTeam) allyMonsterKills.increase(monster, win)
+						else enemyMonsterKills.increase(monster, win)
+					}
+					
 				}
 			}
 		} else {
@@ -653,6 +676,8 @@ form.onsubmit = function() {
 		// TODO: Ally- and Enemy items are less interesting and should be more hidden
 		resultDiv.innerHTML = "<div>"+
 									 playerChampions.toTable("playerchampions", champions)+
+									 allyMonsterKills.toTable ("allymonsterkills" , monsters)+
+									 enemyMonsterKills.toTable("enemymonsterkills", monsters)+
 									 allySummoners.toTable  ("allysummoners",  summoners, minBattlesForSummoners)+
 									 enemySummoners.toTable ("enemysummoners", summoners, minBattlesForSummoners)+
 									 "</div>"+
