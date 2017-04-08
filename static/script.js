@@ -35,10 +35,12 @@ var platforms = {
 var monsters = {
 	AIR_DRAGON:   "Cloud Drake",
 	BARON_NASHOR: "Baron Nashor",
+	DRAGON:       "Dragon (old)",
 	EARTH_DRAGON: "Mountain Drake",
 	ELDER_DRAGON: "Elder Dragon",
 	FIRE_DRAGON:  "Infernal Drake",
 	RIFTHERALD:   "Rift Herald",
+	VILEMAW:      "Vilemaw",
 	WATER_DRAGON: "Ocean Drake"
 }
 
@@ -278,9 +280,9 @@ form.onsubmit = function() {
 					name = nameList[nameList[key].from[nameList[key].from.length - 1]].name + " " + name
 				
 				// Prepare classes for filters
-				if (nameList && nameList[key].into)
+				if (nameList && nameList[key] && nameList[key].into)
 					classAttribute += "filter-into "
-				if (nameList && nameList[key].from)
+				if (nameList && nameList[key] && nameList[key].from)
 					classAttribute += "filter-from "
 				
 				tbodyContent += "<tr class='" + classAttribute + "'>"
