@@ -1,6 +1,7 @@
 "use strict"
 
 // TODO: If a monster was slain by killerId = 0, then look for a Shaco player and credit them. If there was no Shaco player, log the match server side.
+// TODO: Let users select ranked queues
 
 // TODO: Put filter buttons into a mouseover-expandable menu above each table
 // TODO: Turn belowMinimum into a toggle-able filter
@@ -16,6 +17,17 @@
 // TODO: Improve sorting performance for massive (2000+) lists.
 // TODO: Redo "click to reveal": Don't hide items if only 1-4 would be hidden in the first place.
 // TODO: Remember matches between requests so that server doesn't have to send the same matches again on next request. (Server might want to keep recent games in memory too)
+
+// Track these statistics:
+// TODO: Track picks and bans
+// TODO: Track keystones (and maybe other masteries)
+// TODO: Track summoner spells
+// TODO: Track player's kills/deaths to enemy champions
+// TODO: Track champion's red and blue -top/-mid/-bot/-jungle/-supp wins/deaths for super overkill detailed stats (so basically 10 slots per champion - maybe show on mouseover?)
+// TODO: Advanced - track W/L for player's skill orders
+// TODO: Advanced - track "early game" vs "late game" items that lead to a win/loss in 1/3 shortest games vs 1/3 longest games
+// TODO: Very advanced - track "comeback items" vs "expand lead items" that lead to win when bought while (far) behind/ahead
+// TODO: Make objectives and other things per-side, eg. killing bot inhib as blue side might have a different importance than killing bot inhib as red side due to map asymmetry
 
 
 // Platform IDs taken from https://developer.riotgames.com/docs/regional-endpoints
@@ -299,6 +311,8 @@ form.onsubmit = function() {
 				if (name.includes("Enchantment"))
 					name = nameList[nameList[key].from[nameList[key].from.length - 1]].name + " " + name
 				
+				if (!nameList[key])
+					console.log(key, "not in namelist")
 				// Prepare classes for filters
 				if (nameList && nameList[key] && nameList[key].into)
 					classAttribute += "filter-into "
@@ -340,9 +354,9 @@ form.onsubmit = function() {
 	var  enemyChampions = new StatCategory("ENEMY<br>CHAMPION")
 	
 	//items
-	var playerFinalItems = new StatCategory("PLAYER FINAL<br>ITEMS")
+	/*var playerFinalItems = new StatCategory("PLAYER FINAL<br>ITEMS")
 	var   allyFinalItems = new StatCategory("ALLIED FINAL<br>ITEMS")
-	var  enemyFinalItems = new StatCategory("ENEMY FINAL<br>ITEMS")
+	var  enemyFinalItems = new StatCategory("ENEMY FINAL<br>ITEMS")*/
 	var playerItems = new StatCategory("PLAYER<br>ITEMS")
 	var   allyItems = new StatCategory("ALLIED<br>ITEMS")
 	var  enemyItems = new StatCategory("ENEMY<br>ITEMS")
@@ -428,10 +442,10 @@ form.onsubmit = function() {
 				
 				playerChampions.increase(p.championId, win)
 				
-				for (var n = 0; n < 7; n++) {
+				/*for (var n = 0; n < 7; n++) {
 					if (p.stats["item"+n] >0)
 						playerFinalItems.increase(p.stats["item"+n], win)
-				}
+				}*/
 				
 				break
 			}
@@ -546,29 +560,21 @@ form.onsubmit = function() {
 				enemyChampions.increase(participant.championId, win)
 				enemySummoners.increase(player.summonerId, win)
 				
-				for (var n = 0; n < 7; n++) {
+				/*for (var n = 0; n < 7; n++) {
 					if (participant.stats["item"+n] > 0)
 						enemyFinalItems.increase(participant.stats["item"+n], win)
-				}
+				}*/
 
 			// allies
 			} else {
 				allyChampions.increase(participant.championId, win)
 				allySummoners.increase(player.summonerId, win)
 				
-				for (var n = 0; n < 7; n++) {
+				/*for (var n = 0; n < 7; n++) {
 					if (participant.stats["item"+n] > 0)
 						allyFinalItems.increase(participant.stats["item"+n], win)
-				}
+				}*/
 			}
-			// TODO: Advanced - track W/L for player's skill orders
-			// TODO: Track picks and bans
-			// TODO: Track keystones (and maybe other masteries)
-			// TODO: Track summoner spells
-			// TODO: Track player's kills/deaths to enemy champions
-			// TODO: Track champion's red and blue -top/-mid/-bot/-jungle/-supp wins/deaths for super overkill detailed stats
-			// TODO: Very advanced - track "comeback items" vs "expand lead items" that lead to win when bought while (far) behind/ahead
-			// TODO: Advanced - track "early game" vs "late game" items that lead to a win/loss in 1/3 shortest games vs 1/3 longest games
 		}
 		
 		// Track number of wins/losses and game durations
