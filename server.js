@@ -54,6 +54,7 @@ var config = require("./config") // Different configuration variables
 
 // Initialize database for matches
 var matchDB = levelup('./matchDB')
+var itemDB = levelup('./itemDB')
 
 // Set "default entry" directory to /static/
 app.use(express.static("static"))
@@ -446,7 +447,7 @@ function queueMatch(socket, matchUrl) {
 var items = {}
 var itemsVersion = "0.0.0"
 function requestItems(url) {
-	request(null, url, (error, response, msg) => {
+	request(itemDB, url, (error, response, msg) => {
 		if (error || (response && response.statusCode != 200)) {
 			console.log("PROBLEM! Couldn't get ITEM data. Retrying.")
 			if (error || (response && response.statusCode == 429))
