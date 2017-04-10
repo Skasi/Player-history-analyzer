@@ -32,16 +32,34 @@ var platforms = {
 	pbe: "PBE1"
 }
 
-var monsters = {
-	AIR_DRAGON:   "Cloud Drake",
+var objectives = {
 	BARON_NASHOR: "Baron Nashor",
-	DRAGON:       "Dragon (old)",
-	EARTH_DRAGON: "Mountain Drake",
 	ELDER_DRAGON: "Elder Dragon",
-	FIRE_DRAGON:  "Infernal Drake",
 	RIFTHERALD:   "Rift Herald",
 	VILEMAW:      "Vilemaw",
-	WATER_DRAGON: "Ocean Drake"
+	
+	// Elemental dragons
+	AIR_DRAGON:   "Cloud Drake",
+	EARTH_DRAGON: "Mountain Drake",
+	FIRE_DRAGON:  "Infernal Drake",
+	WATER_DRAGON: "Ocean Drake",
+	
+	// Removed
+	DRAGON:       "Dragon (old)",
+	
+	// Buildings
+	OUTER_TURRET:       "Outer turret",
+	INNER_TURRET:       "Inner turret",
+	BASE_TURRET:        "Base turret",
+	INHIBITOR_BUILDING: "Inhibitor",
+	NEXUS_TURRET:       "Nexus turret",
+	
+	// First objectives
+	firstBlood:     "First blood",
+	firstTower:     "First tower",
+	firstInhibitor: "First inhibitor",
+	firstBaron:     "First baron",
+	firstDragon:    "First dragon",
 }
 
 
@@ -327,8 +345,8 @@ form.onsubmit = function() {
 	var   allyItems = new StatCategory("ALLIED<br>ITEMS")
 	var  enemyItems = new StatCategory("ENEMY<br>ITEMS")
 	
-	var  allyMonsterKills = new StatCategory("ALLIED<br>MONSTER KILLS")
-	var enemyMonsterKills = new StatCategory("ENEMY<br>MONSTER KILLS")
+	var  allyObjectives = new StatCategory("ALLIED<br>KILLS")
+	var enemyObjectives = new StatCategory("ENEMY<br>KILLS")
 	
 	//game durations for SVG graph
 	var totalWinDuration = 0
@@ -417,6 +435,22 @@ form.onsubmit = function() {
 			}
 		}
 		
+		// Analyze team data for firstBlood, firstTower, firstInhibitor, firstBaron, firstDragon
+		for (var teamKey in matchData.teams) {
+			var team = matchData.teams[teamKey]
+			// Only iterate through specific keys of team object
+			for (var objectiveKey in (({ firstBlood, firstTower, firstInhibitor, firstBaron, firstDragon }) => ({ firstBlood, firstTower, firstInhibitor, firstBaron, firstDragon }))(team)) {
+				var objective = team[objectiveKey]
+				if (objective) {
+					if (team.teamId === playerTeam)
+						allyObjectives.increase(objectiveKey, win)
+					else
+						enemyObjectives.increase(objectiveKey, win)
+				}
+			}
+		}
+		
+		
 		// Analyze timeline data to look for item buy/undo events
 		if (matchData.timeline) {
 			var frames = matchData.timeline.frames
@@ -465,8 +499,17 @@ form.onsubmit = function() {
 						else
 							var monster = event.monsterType
 						
-						if (matchData.participants[event.killerId-1].teamId == playerTeam) allyMonsterKills.increase(monster, win)
-						else enemyMonsterKills.increase(monster, win)
+						if (matchData.participants[event.killerId-1].teamId == playerTeam) allyObjectives.increase(monster, win)
+						else enemyObjectives.increase(monster, win)
+					}
+					else if (eventType == ("BUILDING_KILL")) {
+						if (event.buildingType === "TOWER_BUILDING")
+							var building = event.towerType
+						else if (event.buildingType === "INHIBITOR_BUILDING")
+							var building = event.buildingType
+						
+						if (event.teamId != playerTeam) allyObjectives.increase(building, win)
+						else enemyObjectives.increase(building, win)
 					}
 					
 				}
@@ -678,8 +721,8 @@ form.onsubmit = function() {
 		// TODO: Ally- and Enemy items are less interesting and should be more hidden
 		resultDiv.innerHTML = "<div>"+
 									 playerChampions.toTable("playerchampions", champions)+
-									 allyMonsterKills.toTable ("allymonsterkills" , monsters)+
-									 enemyMonsterKills.toTable("enemymonsterkills", monsters)+
+									 allyObjectives.toTable ("allyObjectives" , objectives)+
+									 enemyObjectives.toTable("enemyObjectives", objectives)+
 									 allySummoners.toTable  ("allysummoners",  summoners, minBattlesForSummoners)+
 									 enemySummoners.toTable ("enemysummoners", summoners, minBattlesForSummoners)+
 									 "</div>"+
