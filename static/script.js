@@ -1,5 +1,7 @@
 "use strict"
 
+// TODO: If a monster was slain by killerId = 0, then look for a Shaco player and credit them. If there was no Shaco player, log the match server side.
+
 // TODO: Put filter buttons into a mouseover-expandable menu above each table
 // TODO: Turn belowMinimum into a toggle-able filter
 
@@ -494,6 +496,11 @@ form.onsubmit = function() {
 					}
 					// Count monsters killed (including CS and jungles?)
 					else if (eventType === ("ELITE_MONSTER_KILL")) {
+						if (event.killerId == 0) {
+							console.log("Error: killerId equals 0. Skipping monster kill. MatchID: " + matchData.matchId)
+							continue
+						}
+						
 						if (event.monsterSubType)
 							var monster = event.monsterSubType
 						else
