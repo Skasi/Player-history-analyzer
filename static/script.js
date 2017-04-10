@@ -621,7 +621,7 @@ form.onsubmit = function() {
 		// TODO: Replace maxLength and loop with two separate loops for winGameLengths and lossGameLengths
 		var maxLength = Math.max(winGameLengths.length, lossGameLengths.length)
 		// TODO: Maybe add mouseovers to game-blocks/bars that show exact times and number of games
-		var svgCode = ""
+		
 		for (var i = 0; i < maxLength; i++) {
 			var w = winGameLengths[i] || 0
 			var l = lossGameLengths[i] || 0
@@ -630,6 +630,9 @@ form.onsubmit = function() {
 		}
 		maxGames += 3 // Add some blank space above
 		// TODO: replace y height stuff
+		
+		// Initialize SVG code
+		var svgCode = "<text x=0 y=0 fill=#444 font-size=2em dominant-baseline=hanging>Game durations</text>"
 		
 		// Horizontal background lines
 		for (var i = 1; i <= maxGames; i++) {
@@ -697,16 +700,17 @@ form.onsubmit = function() {
 		}
 		
 		// Legend
-		svgCode += "<g>"+
-		"<rect x=-50 y="+(maxGames*10+30+3)+" fill=#888 width=6 height=9 />"+
-		"<text x=-40 y="+(maxGames*10+30)+"   fill=#888 dominant-baseline=hanging>Remake</text>"+
-		"<rect x=50  y="+(maxGames*10+30+3)+" fill=#0f0 width=6 height=9 />"+
-		"<text x=60  y="+(maxGames*10+30)+"   fill=#0f0 dominant-baseline=hanging>Win</text>"+
-		"<rect x=120 y="+(maxGames*10+30+3)+" fill=#ff0 width=6 height=9 />"+
-		"<text x=130 y="+(maxGames*10+30)+"   fill=#ff0 dominant-baseline=hanging>Win&Loss</text>"+
-		"<rect x=220 y="+(maxGames*10+30+3)+" fill=#f00 width=6 height=9 />"+
-		"<text x=230 y="+(maxGames*10+30)+"   fill=#f00 dominant-baseline=hanging>Loss</text>"+
-		"</g>"
+		svgCode +=
+			"<g>"+
+			"<rect x=-50 y="+(maxGames*10+30+3)+" fill=#888 width=6 height=9 />"+
+			"<text x=-40 y="+(maxGames*10+30)+"   fill=#888 dominant-baseline=hanging>Remake</text>"+
+			"<rect x=50  y="+(maxGames*10+30+3)+" fill=#0f0 width=6 height=9 />"+
+			"<text x=60  y="+(maxGames*10+30)+"   fill=#0f0 dominant-baseline=hanging>Win</text>"+
+			"<rect x=120 y="+(maxGames*10+30+3)+" fill=#ff0 width=6 height=9 />"+
+			"<text x=130 y="+(maxGames*10+30)+"   fill=#ff0 dominant-baseline=hanging>Win&Loss</text>"+
+			"<rect x=220 y="+(maxGames*10+30+3)+" fill=#f00 width=6 height=9 />"+
+			"<text x=230 y="+(maxGames*10+30)+"   fill=#f00 dominant-baseline=hanging>Loss</text>"+
+			"</g>"
 		
 		// Scale SVG based on content
 		// add 75 and 50 svg-px left and bottom for labels and legend
