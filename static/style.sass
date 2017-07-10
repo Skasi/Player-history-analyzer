@@ -1,0 +1,270 @@
+/* !!TODO:
+  Chrome bug: Chrome overwrites background color and image using !important rules; can probably be dealt with somehow
+  bugreport: https://bugs.chromium.org/p/chromium/issues/detail?id=46543
+  
+  Bring back :hover showing overflow.
+  
+  Somehow get the website to display on mobile properly and performance-efficient. SVG causing problems on some low-end devices.
+  */
+
+
+//League themed colors
+$dark-teal:    #134 //dark teal used in client
+$bright-teal:  #689 //bright teal (background, borders)
+$white-beige:  #dc9 //white-beige (text, or highlighting gold)
+$golden-text:  #da2 //golden text color (text, border)
+
+//Black&white colors
+$black:        #000
+$dark-gray:    #777
+$gray:         #888
+$light-gray:   #aaa
+$lighter-gray: #ccc
+$white:        #fff
+
+//Moar colors
+$red:          #f00
+$green:        #0f0
+
+
+=radial-gradient($shape, $inner-color, $outer-color)
+	background: $black /* For browsers that do not support gradients */
+	background:         radial-gradient($shape, $dark-teal, $black) /* Standard syntax */
+	background:      -o-radial-gradient($shape, $dark-teal, $black) /* Opera 11.6 to 12.0 */
+	background:    -moz-radial-gradient($shape, $dark-teal, $black) /* Firefox 3.6 to 15 */
+	background: -webkit-radial-gradient($shape, $dark-teal, $black) /* Safari */
+
+=linear-gradient($upper-color, $lower-color)
+	background: $lower-color /* For browsers that do not support gradients */
+	background:         linear-gradient($upper-color, $lower-color) /* Standard syntax */
+	background:      -o-linear-gradient($upper-color, $lower-color) /* Opera 11.6 to 12.0 */
+	background:    -moz-linear-gradient($upper-color, $lower-color) /* Firefox 3.6 to 15 */
+	background: -webkit-linear-gradient($upper-color, $lower-color) /* Safari */
+
+
+*
+	color: $white-beige;
+
+
+html, body
+	margin: 0%
+	height: 100%
+
+body
+	+radial-gradient(circle, $dark-teal, $black)
+	background-attachment: fixed
+
+
+.transparent
+	opacity: 0.6
+
+
+/* Fix crazy emoji line height on mobile (Android) */
+span 
+	line-height: 1em
+
+
+input, button, select, option, .more 
+	background-color: $black
+
+
+#readmes, #formContainer, #data 
+	float: left
+	margin: 1px 1em
+
+
+#username, #championName 
+	background-size: contain
+	background-position: right
+	background-repeat: no-repeat
+
+
+#progress 
+	display: inline-block
+
+
+#submit[disabled] 
+	opacity: 0.5
+
+
+#result 
+	clear: left
+	display: flex
+	justify-content: space-between
+
+
+/* SVG */
+#duration 
+	/* outline-width does not support multiple parameters, so instead of using borders top/bot and outlines left/right we use outlines everywhere but add margin top/bot */
+	margin: 1px 0
+	outline-width: 1px
+	outline-style: solid
+	outline-color: $gray
+
+svg:empty 
+	display: none
+
+
+/* TABLES */
+table 
+	margin: 0 0 1em
+	border: 1px solid $gray
+	border-radius: 12px
+
+
+.belowMinimum,
+.filter-only-completed tbody .filter-into, .filter-only-completed tbody tr:not(.filter-from)
+	display: none
+
+.showAll .belowMinimum 
+	display: table-row
+
+
+.notYetSortable th, .sortable th
+	+linear-gradient($white-beige, $light-gray)
+
+
+.sortable th, .revealButton 
+	cursor: pointer !important /* override help-pointers from [title] and similar */
+
+.sortable th:hover 
+	box-shadow: 0 0 0 2px $white
+
+th.sorttable_sorted, th.sorttable_sorted_reverse
+	+linear-gradient($light-gray, $white-beige)
+
+.sortable th.sorttable_sorted:before  
+	content: "\25B4"
+	text-shadow: 0 0 2px $red
+	color: $black
+
+.sortable th:not(sorttable_sorted):before  
+	content: "\25B5"
+	text-shadow: 0 0 2px $white
+	color: $dark-gray
+
+.sortable th.sorttable_sorted_reverse:after  
+	content: "\25BE"
+	text-shadow: 0 0 2px $red
+	color: $black
+
+.sortable th:not(sorttable_sorted_reverse):after  
+	content: "\25BF"
+	text-shadow: 0 0 2px $white
+	color: $dark-gray
+
+
+/* Hide middle part of table */
+//.minimize tr:nth-child(5) ~ tr 
+//	display: none
+//
+//.minimize tr:nth-child(5) td 
+//	display: none
+//
+//.minimize tr:nth-child(5):before 
+//	content: "..."
+//	display: block
+//
+//.minimize tr:nth-last-child(5) ~ tr 
+//	display: table-row !important
+//
+//.minimize tr:nth-last-child(5) ~ tr td 
+//	display: table-cell !important
+//
+//.minimize tr:nth-last-child(5) ~ tr:before 
+//	display: none !important
+
+
+th:first-child, td:first-child 
+	max-width: 12ex
+
+th 
+	font-size: 120%
+	background-color: $lighter-gray
+	color: $black
+
+th:first-child 
+	border-radius: 8px 0 0 0
+
+th:last-child 
+	border-radius: 0 8px 0 0
+
+th>div 
+	color: inherit
+	background-color: transparent
+
+.rotated 
+	width: 1.25em
+	line-height: 1
+	transform: rotate(90deg)
+	margin: 0 0 2.5ex calc(50% - 0.625em)
+
+td:nth-child(2n) 
+	background-color: $dark-teal
+
+td:nth-child(2n+1) 
+	background-color: $black
+
+.statNumber 
+	text-align: right
+	font-size: 80%
+
+.statNumber::first-letter 
+	font-size: 125%
+
+.statName 
+	//position: relative
+	overflow: hidden
+	white-space: nowrap
+	//padding-right: 0.75ex
+
+//td:first-child:hover 
+//	overflow: visible
+
+.statName span 
+	background-color: inherit
+
+/* position: relative needed for some reason to stop mouseoveroverflow from being semi-transparent.
+  PROBLEM: padding-right DOES CAUSE slowdowns because column-width recalculates stuff all the time */
+//td:first-child:hover span 
+//	z-index: 1
+
+/* Highlight row on mouseover */
+tbody>tr:hover 
+	outline: solid white 1px
+
+
+/* INPUTS */
+input, select, button 
+	border-color: $gray
+
+input:hover, select:hover, button:hover 
+	border-color: $white
+
+input:focus, select:focus, button:focus 
+	background-color: $white
+	color: $black
+
+
+/* MOUSEOVERS */
+.mouseover, [title] 
+	cursor: help
+
+.mouseover 
+	padding: 0.5em
+	border: dashed 1px $white
+
+.mouseover>.more 
+	cursor: auto
+
+.more 
+	visibility: hidden
+	display: inline-block
+	position: absolute
+	z-index: 100
+	padding: 1em
+	border: dashed 1px $white
+	max-width: 60em
+
+:hover>.more 
+	visibility: visible
