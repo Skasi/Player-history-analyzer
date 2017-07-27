@@ -20,6 +20,8 @@ console.log("\x1b[7mInitializing server..\x1b[0m")
 */
 
 /*
+!!!!!!!!! TODO: Either merge timeline data with match or send both seperately or idk what.
+
 TODO: Add some sort of intervall to update items and champions every now and then for when new stuff is released - don't forget to reset: items = {}
 TODO (fallback): Remember match histories for players. Only use these cached histories if riot servers are unresponsive. Remember the longest and most recent match histories, then pick whichever has sufficient data.
 TODO: Theoretically users might be able to send 10000 single requests and could cause the queue to never start a timeout.
@@ -320,7 +322,7 @@ function queueSummoner(socket, data, queueWithMatchlist) {
 		socket,
 		{
 			db: null,
-			url: "https://"+data.region+".api.pvp.net/api/lol/"+data.region+"/v1.4/summoner/by-name/"+data.username+"?",
+			url: "https://"+data.region+".api.riotgames.com/lol/summoner/v3/summoners/by-name/"+data.username+"?",
 			action: (error, response, summonerData) => {
 				if (error || (response && response.statusCode != 200)) {
 					// log potential network error
@@ -347,13 +349,8 @@ function queueSummoner(socket, data, queueWithMatchlist) {
 				
 				// optional callback for queuing matchlist
 				if (queueWithMatchlist) {
-					// get requested summoner's id
-					var summonerId
-					for (var k in summonerData)
-						summonerId = summonerData[k].id
-					
 					// prepare matchlist url
-					var matchlistUrl = "https://"+data.region+".api.pvp.net/api/lol/"+data.region+"/v2.2/matchlist/by-summoner/"+summonerId+"?championIds="+(data.championId || "")+"&beginTime="+(data.beginTime || "")+"&endTime="+(data.endTime || "")+"&beginIndex="+(data.beginIndex || 0)+"&endIndex="+(data.endIndex || 100)
+					var matchlistUrl = "https://"+data.region+".api.riotgames.com/lol/match/v3/matchlists/by-account/"+summonerData.accountId+"?champion="+(data.championId || "")+"&beginTime="+(data.beginTime || "")+"&endTime="+(data.endTime || "")+"&beginIndex="+(data.beginIndex || 0)+"&endIndex="+(data.endIndex || 100)
 					queueMatchlist(socket, matchlistUrl)
 				}
 			}
@@ -401,10 +398,10 @@ function queueMatchlist(socket, matchlistUrl) {
 				
 				for (var i = 0; i < matchlistData.matches.length; i++) {
 					var match = matchlistData.matches[i]
-					match.region = match.region.toLowerCase()
+					match.platformId = match.platformId.toLowerCase()
 					
 					// prepare match url
-					var matchUrl = "https://"+match.region+".api.pvp.net/api/lol/"+match.region+"/v2.2/match/"+match.matchId+"?includeTimeline=true"
+					var matchUrl = "https://"+match.platformId+".api.riotgames.com/lol/match/v3/matches/"+match.gameId+"?"
 					queueMatch(socket, matchUrl)
 				}
 			}
@@ -440,8 +437,36 @@ function queueMatch(socket, matchUrl) {
 	)
 }
 
-// GET STATIC DATA FROM RITO ONCE
+// function to call itself for retries
+function queueLeague(socket, leagueUrl) {
+	var leagueUrl = "https://"+data.region+".api.riotgames.com/lol/league/v3/positions/by-summoner/"+summonerId+"?"
+	requestQueue.append(
+		socket,
+		{
+			db: matchDB,
+			url: matchUrl,
+			action: (error, response, body) => {
+				if (error || (response && response.statusCode != 200)) {
+					if (error)
+						console.log("REQUEST ERROR for league\n", matchUrl, "error:\n", error)
+					else
+						console.log("REQUEST ERROR for league\n", matchUrl, "response:\n", response.statusCode)
+				
+					// re-queue if error or 429 (retry-after is handled by request)
+					if (error || response.statusCode == 429 || response.statusCode == 500 || response.statusCode == 503)
+						//!! TODO: 503s could be handled by temporarily increasing the delay between requestQueue using a less-"extreme" retryAfter
+						queueLeague.apply(this, arguments)
+					return
+				}
+			
+				//console.log("sending league to user")
+				socket.emit("league", body)
+			}
+		}
+	)
+}
 
+// GET STATIC DATA FROM RITO ONCE
 
 // Item info
 var items = {}
@@ -501,14 +526,14 @@ function requestVersions(url) {
 		
 		for (var i in msg) {
 			console.log("Requesting items for version " + msg[i] + ".")
-			requestItems("https://global.api.pvp.net/api/lol/static-data/NA/v1.2/item?itemListData=from,into&locale=en_US&version=" + msg[i])
+			requestItems("https://euw1.api.riotgames.com/lol/static-data/v3/items?tags=from&tags=into&locale=en_US&version=" + msg[i])
 		}
 	})
 }
 
 // Request game versions to then be able to request items for the different game versions
-requestVersions("https://global.api.pvp.net/api/lol/static-data/NA/v1.2/versions?")
-requestChampion("https://global.api.pvp.net/api/lol/static-data/NA/v1.2/champion?locale=en_US&dataById=true")
+requestVersions("https://euw1.api.riotgames.com/lol/static-data/v3/versions?")
+requestChampion("https://euw1.api.riotgames.com/lol/static-data/v3/champions?locale=en_US&dataById=true")
 
 
 // Handle shutdown command

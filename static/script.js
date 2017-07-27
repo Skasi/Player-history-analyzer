@@ -180,15 +180,15 @@ function validateUsername() {
 	
 	socket.emit("summoner", {
 		username: usernameInput.value,
-		region: regionInput.options[regionInput.selectedIndex].text.toLowerCase()
+		region: regionInput[regionInput.selectedIndex].value
 	})
 	expectSummonerMessage()
 }
 
 function expectSummonerMessage() {
-	socket.once("summoner", (msg) => {
-		if (msg) {
-			user = msg[usernameInput.value.toLowerCase().split(" ").join("")]
+	socket.once("summoner", (data) => {
+		if (data) {
+			user = data
 			usernameInput.value = user.name
 			userIdSpan.innerHTML = "✔" // check mark for success
 			usernameInput.style.backgroundImage = "url(https://ddragon.leagueoflegends.com/cdn/"+latestVersion+"/img/profileicon/"+user.profileIconId+".png)"
@@ -213,7 +213,7 @@ form.onsubmit = function() {
 	// Remove .column for improved rendering speed
 	resultDiv.className = "" // TODO: This is no longer necessary for flexbox display. Only needed when using CSS' column-width and similar
 	// prepare values for urls // TODO: region and username could become obsolete
-	var region = regionInput.options[regionInput.selectedIndex].text.toLowerCase()
+	var region = regionInput[regionInput.selectedIndex].value
 	var username = usernameInput.value
 	var minAge = minAgeInput.value
 	var maxAge = maxAgeInput.value
@@ -379,7 +379,7 @@ form.onsubmit = function() {
 	var totalAssists = 0
 	
 	var bestKDA = 0
-	var bestKDAmatchID
+	var bestKDAgameId
 	var bestKDAstats
 	
 	function toHead(title) {
@@ -408,12 +408,12 @@ form.onsubmit = function() {
 		var playerTeam
 		var win
 		
-		if (!matchData.matchDuration) console.log(matchData)
-		var duration = Math.floor(matchData.matchDuration/60 + 0.5)
+		if (!matchData.gameDuration) console.log(matchData)
+		var duration = Math.floor(matchData.gameDuration/60 + 0.5)
 		
 		// Match ended in a /remake before 4:30
 		// minor-TODO: check for inhib destruction and ((min 5 tower kills on Summoner's rift) or (min 3 towers on TT))
-		if (matchData.matchDuration <= 270) {
+		if (matchData.gameDuration <= 270) {
 			remakes++
 			remakeGameLengths[duration] = remakeGameLengths[duration] + 1 || 1
 			
@@ -425,13 +425,13 @@ form.onsubmit = function() {
 			var p = matchData.participants[pId]
 			if (matchData.participantIdentities[pId].player.summonerId == user.id) {
 				playerTeam = p.teamId
-				win = p.stats.winner
+				win = p.stats.win
 				
 				// find best KDA
 				var tempKDA = (p.stats.kills + p.stats.assists) / Math.max(0.75, p.stats.deaths)
 				if (tempKDA > bestKDA) {
 					bestKDA = tempKDA
-					bestKDAmatchID = matchData.matchId
+					bestKDAgameId = matchData.gameId
 					bestKDAstats = p.stats.kills+"/"+p.stats.deaths+"/"+p.stats.assists
 				}
 				
@@ -511,7 +511,7 @@ form.onsubmit = function() {
 					// Count monsters killed (including CS and jungles?)
 					else if (eventType === ("ELITE_MONSTER_KILL")) {
 						if (event.killerId == 0) {
-							console.log("Error: killerId equals 0. Skipping monster kill. MatchID: " + matchData.matchId)
+							console.log("Error: killerId equals 0. Skipping monster kill. gameId: " + matchData.gameId)
 							continue
 						}
 						
@@ -578,14 +578,14 @@ form.onsubmit = function() {
 		}
 		
 		// Track number of wins/losses and game durations
-		longestGame = Math.max(matchData.matchDuration, longestGame)
+		longestGame = Math.max(matchData.gameDuration, longestGame)
 		if (win) {
 			wins++
-			totalWinDuration += matchData.matchDuration
+			totalWinDuration += matchData.gameDuration
 			winGameLengths[duration] = winGameLengths[duration] + 1 || 1
 		} else {
 			losses++
-			totalLossDuration += matchData.matchDuration
+			totalLossDuration += matchData.gameDuration
 			lossGameLengths[duration] = lossGameLengths[duration] + 1 || 1
 		}
 	}
@@ -596,11 +596,11 @@ form.onsubmit = function() {
 		//console.log("DRAWING RESULTS!", progress)
 		
 		// UPDATE PROGRESS DISPLAY
-		var lastMatchCreation = new Date(lastMatch.matchCreation)
+		var lastgameCreation = new Date(lastMatch.gameCreation)
 		
 		var outputProgress = "<div id=progress class=mouseover><strong>Progress:</strong> "+progress+" / "+max+"<br><progress value="+progress+" max="+max+"></progress>"+
 								"<div class='more'><a href='"+matchlistUrl+"'>Matchlist</a> (requires API key)<br>"+
-								"Last match analyzed: ID: "+lastMatch.matchId+"<br>Date: "+lastMatchCreation.toString()+"</div>"+
+								"Last match analyzed: ID: "+lastMatch.gameId+"<br>Date: "+lastgameCreation.toString()+"</div>"+
 								"</div><button id=stop onclick=stop()>Stop</button>"
 								// TODO: Don't draw stop button and progress completely new, instead use display: none; for Results
 								// TODO: get timestamps of 1st and last match in matchlist to provide info about their dates (timeframe of stats)
@@ -611,7 +611,7 @@ form.onsubmit = function() {
 		
 		var otherStats = "<span>Average KDA</span>: "+(Math.ceil(totalKills/progress*100)/100)+"/"+(Math.ceil(totalDeaths/progress*100)/100)+"/"+(Math.ceil(totalAssists/progress*100)/100)+"</span><br>"+
 			"<span title='( Kills + Assists ) / ( Deaths ), where Deaths of 0 are replaced by 0.75'>Best KDA</span>: "+bestKDAstats+
-			" (<a href=http://matchhistory."+region+".leagueoflegends.com/en/#match-details/"+platforms[region]+"/"+bestKDAmatchID+">match</a>)"
+			" (<a href=http://matchhistory."+region+".leagueoflegends.com/en/#match-details/"+platforms[region]+"/"+bestKDAgameId+">match</a>)"
 		
 		// Draw progress info
 		dataDiv.innerHTML = outputProgress + outputTotalsTable + otherStats
