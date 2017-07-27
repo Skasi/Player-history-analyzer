@@ -55,9 +55,7 @@ input, button, select, option, .more {
 
 #duration {
 	margin: 1px 0;
-	outline-width: 1px;
-	outline-style: solid;
-	outline-color: #888;
+	outline: 1px solid #888;
 }
 
 svg:empty {
@@ -78,20 +76,12 @@ table {
 	display: table-row;
 }
 
-.notYetSortable th, .sortable th {
+.sortable th, .notYetSortable th {
 	background: #aaa;
 	background: linear-gradient(#dc9, #aaa);
 	background: -o-linear-gradient(#dc9, #aaa);
 	background: -moz-linear-gradient(#dc9, #aaa);
 	background: -webkit-linear-gradient(#dc9, #aaa);
-}
-
-.sortable th, .revealButton {
-	cursor: pointer !important;
-}
-
-.sortable th:hover {
-	box-shadow: 0 0 0 2px #fff;
 }
 
 th.sorttable_sorted, th.sorttable_sorted_reverse {
@@ -100,6 +90,14 @@ th.sorttable_sorted, th.sorttable_sorted_reverse {
 	background: -o-linear-gradient(#aaa, #dc9);
 	background: -moz-linear-gradient(#aaa, #dc9);
 	background: -webkit-linear-gradient(#aaa, #dc9);
+}
+
+.sortable th, .revealButton {
+	cursor: pointer !important;
+}
+
+.sortable th:hover {
+	box-shadow: 0 0 0 2px #fff;
 }
 
 .sortable th.sorttable_sorted:before {
@@ -137,11 +135,11 @@ th {
 }
 
 th:first-child {
-	border-radius: 8px 0 0 0;
+	border-radius-top-left: 8px;
 }
 
 th:last-child {
-	border-radius: 0 8px 0 0;
+	border-radius-top-right: 8px;
 }
 
 th > div {
