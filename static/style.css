@@ -1,22 +1,3 @@
-/* !!TODO:
-Chrome bug: Chrome overwrites background color and image using !important rules; can probably be dealt with somehow
-bugreport: https://bugs.chromium.org/p/chromium/issues/detail?id=46543
-
-Bring back :hover showing overflow.
-
-Somehow get the website to display on mobile properly and performance-efficient. SVG causing problems on some low-end devices.
-
-
-
-COLORS:
-
-23, 49, 61: or #134 dark teal used in client
-98, 141, 149: or ~ #689 bright teal (background, borders)
-
-218, 172, 26: or ~ #da2 golden text color (text, border)
-215, 196, 164: or ~ #dc9 white-beige (text, or highlighting gold)
-*/
-
 * {
 	color: #dc9;
 }
@@ -25,12 +6,13 @@ html, body {
 	margin: 0%;
 	height: 100%;
 }
+
 body {
-	background: #000; /* For browsers that do not support gradients */
-	background:         radial-gradient(circle, #134, #000); /* Standard syntax */
-	background:      -o-radial-gradient(circle, #134, #000); /* Opera 11.6 to 12.0 */
-	background:    -moz-radial-gradient(circle, #134, #000); /* Firefox 3.6 to 15 */
-	background: -webkit-radial-gradient(circle, #134, #000); /* Safari */
+	background: #000;
+	background: radial-gradient(circle, #134, #000);
+	background: -o-radial-gradient(circle, #134, #000);
+	background: -moz-radial-gradient(circle, #134, #000);
+	background: -webkit-radial-gradient(circle, #134, #000);
 	background-attachment: fixed;
 }
 
@@ -38,7 +20,6 @@ body {
 	opacity: 0.6;
 }
 
-/* Fix crazy emoji line height on mobile (Android) */
 span {
 	line-height: 1em;
 }
@@ -72,179 +53,165 @@ input, button, select, option, .more {
 	justify-content: space-between;
 }
 
-/* SVG */
 #duration {
-	/* outline-width does not support multiple parameters, so instead of using borders top/bot and outlines left/right we use outlines everywhere but add margin top/bot */
 	margin: 1px 0;
 	outline-width: 1px;
 	outline-style: solid;
 	outline-color: #888;
 }
+
 svg:empty {
 	display: none;
 }
 
-/* TABLES */
 table {
 	margin: 0 0 1em;
 	border: 1px solid #888;
 	border-radius: 12px;
 }
 
-.belowMinimum,
-.filter-only-completed tbody tr.filter-into, .filter-only-completed tbody tr:not(.filter-from)
-{
+.belowMinimum, .filter-only-completed tbody .filter-into, .filter-only-completed tbody tr:not(.filter-from) {
 	display: none;
 }
+
 .showAll .belowMinimum {
 	display: table-row;
 }
 
 .notYetSortable th, .sortable th {
-	background: #000; /* For browsers that do not support gradients */
-	background:         linear-gradient(#dc9, #aaa); /* Standard syntax */
-	background:      -o-linear-gradient(#dc9, #aaa); /* Opera 11.6 to 12.0 */
-	background:    -moz-linear-gradient(#dc9, #aaa); /* Firefox 3.6 to 15 */
-	background: -webkit-linear-gradient(#dc9, #aaa); /* Safari */
+	background: #aaa;
+	background: linear-gradient(#dc9, #aaa);
+	background: -o-linear-gradient(#dc9, #aaa);
+	background: -moz-linear-gradient(#dc9, #aaa);
+	background: -webkit-linear-gradient(#dc9, #aaa);
 }
 
 .sortable th, .revealButton {
-	cursor: pointer !important; /* override help-pointers from [title] and similar */
+	cursor: pointer !important;
 }
+
 .sortable th:hover {
 	box-shadow: 0 0 0 2px #fff;
 }
+
 th.sorttable_sorted, th.sorttable_sorted_reverse {
-	background: #000; /* For browsers that do not support gradients */
-	background:         linear-gradient(#aaa, #dc9); /* Standard syntax */
-	background:      -o-linear-gradient(#aaa, #dc9); /* Opera 11.6 to 12.0 */
-	background:    -moz-linear-gradient(#aaa, #dc9); /* Firefox 3.6 to 15 */
-	background: -webkit-linear-gradient(#aaa, #dc9); /* Safari */
-}
-.sortable th.sorttable_sorted:before { 
-	 content: "\25B4";
-	 text-shadow: 0 0 2px #f00;
-	 color: #000;
-}
-.sortable th:not(sorttable_sorted):before { 
-	 content: "\25B5";
-	 text-shadow: 0 0 2px #fff;
-	 color: #777;
-}
-.sortable th.sorttable_sorted_reverse:after { 
-	 content: "\25BE";
-	 text-shadow: 0 0 2px #f00;
-	 color: #000;
-}
-.sortable th:not(sorttable_sorted_reverse):after { 
-	 content: "\25BF";
-	 text-shadow: 0 0 2px #fff;
-	 color: #777;
+	background: #dc9;
+	background: linear-gradient(#aaa, #dc9);
+	background: -o-linear-gradient(#aaa, #dc9);
+	background: -moz-linear-gradient(#aaa, #dc9);
+	background: -webkit-linear-gradient(#aaa, #dc9);
 }
 
-/* Hide middle part of table */
-/*.minimize tr:nth-child(5) ~ tr {
-	display: none;
+.sortable th.sorttable_sorted:before {
+	content: "\25B4";
+	text-shadow: 0 0 2px #f00;
+	color: #000;
 }
-.minimize tr:nth-child(5) td {
-	display: none;
+
+.sortable th:not(sorttable_sorted):before {
+	content: "\25B5";
+	text-shadow: 0 0 2px #fff;
+	color: #777;
 }
-.minimize tr:nth-child(5):before {
-	content: "...";
-	display: block;
+
+.sortable th.sorttable_sorted_reverse:after {
+	content: "\25BE";
+	text-shadow: 0 0 2px #f00;
+	color: #000;
 }
-.minimize tr:nth-last-child(5) ~ tr {
-	display: table-row !important;
+
+.sortable th:not(sorttable_sorted_reverse):after {
+	content: "\25BF";
+	text-shadow: 0 0 2px #fff;
+	color: #777;
 }
-.minimize tr:nth-last-child(5) ~ tr td {
-	display: table-cell !important;
-}
-.minimize tr:nth-last-child(5) ~ tr:before {
-	display: none !important;
-}*/
 
 th:first-child, td:first-child {
 	max-width: 12ex;
 }
+
 th {
 	font-size: 120%;
 	background-color: #ccc;
 	color: #000;
 }
+
 th:first-child {
 	border-radius: 8px 0 0 0;
 }
+
 th:last-child {
 	border-radius: 0 8px 0 0;
 }
-th>div {
+
+th > div {
 	color: inherit;
 	background-color: transparent;
 }
+
 .rotated {
 	width: 1.25em;
 	line-height: 1;
 	transform: rotate(90deg);
 	margin: 0 0 2.5ex calc(50% - 0.625em);
 }
+
 td:nth-child(2n) {
 	background-color: #134;
 }
+
 td:nth-child(2n+1) {
 	background-color: #000;
 }
+
 .statNumber {
 	text-align: right;
 	font-size: 80%;
 }
+
 .statNumber::first-letter {
 	font-size: 125%;
 }
+
 .statName {
-	/*position: relative;*/
 	overflow: hidden;
 	white-space: nowrap;
-	/*padding-right: 0.75ex;*/
 }
-/*td:first-child:hover {
-	overflow: visible;
-}*/
+
 .statName span {
 	background-color: inherit;
 }
-/* position: relative; needed for some reason to stop mouseoveroverflow from being semi-transparent.
-PROBLEM: padding-right DOES CAUSE slowdowns because column-width recalculates stuff all the time */
-/*td:first-child:hover span {
-	z-index: 1;
-}*/
-/* Highlight row on mouseover */
-tbody>tr:hover {
+
+tbody > tr:hover {
 	outline: solid white 1px;
 }
 
-/* INPUTS */
 input, select, button {
 	border-color: #888;
 }
+
 input:hover, select:hover, button:hover {
 	border-color: #fff;
 }
+
 input:focus, select:focus, button:focus {
 	background-color: #fff;
 	color: #000;
 }
 
-/* MOUSEOVERS */
 .mouseover, [title] {
 	cursor: help;
 }
+
 .mouseover {
 	padding: 0.5em;
 	border: dashed 1px #fff;
 }
-.mouseover>.more {
+
+.mouseover > .more {
 	cursor: auto;
 }
+
 .more {
 	visibility: hidden;
 	display: inline-block;
@@ -254,6 +221,7 @@ input:focus, select:focus, button:focus {
 	border: dashed 1px #fff;
 	max-width: 60em;
 }
-:hover>.more {
+
+:hover > .more {
 	visibility: visible;
 }

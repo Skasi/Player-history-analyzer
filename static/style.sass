@@ -60,53 +60,51 @@ body
 
 
 /* Fix crazy emoji line height on mobile (Android) */
-span 
+span
 	line-height: 1em
 
 
-input, button, select, option, .more 
+input, button, select, option, .more
 	background-color: $black
 
 
-#readmes, #formContainer, #data 
+#readmes, #formContainer, #data
 	float: left
 	margin: 1px 1em
 
 
-#username, #championName 
+#username, #championName
 	background-size: contain
 	background-position: right
 	background-repeat: no-repeat
 
 
-#progress 
+#progress
 	display: inline-block
 
 
-#submit[disabled] 
+#submit[disabled]
 	opacity: 0.5
 
 
-#result 
+#result
 	clear: left
 	display: flex
 	justify-content: space-between
 
 
 /* SVG */
-#duration 
+#duration
 	/* outline-width does not support multiple parameters, so instead of using borders top/bot and outlines left/right we use outlines everywhere but add margin top/bot */
 	margin: 1px 0
-	outline-width: 1px
-	outline-style: solid
-	outline-color: $gray
+	outline: 1px solid $gray
 
-svg:empty 
+svg:empty
 	display: none
 
 
 /* TABLES */
-table 
+table
 	margin: 0 0 1em
 	border: 1px solid $gray
 	border-radius: 12px
@@ -116,103 +114,103 @@ table
 .filter-only-completed tbody .filter-into, .filter-only-completed tbody tr:not(.filter-from)
 	display: none
 
-.showAll .belowMinimum 
+.showAll .belowMinimum
 	display: table-row
 
 
-.notYetSortable th, .sortable th
+.sortable th, .notYetSortable th
 	+linear-gradient($white-beige, $light-gray)
-
-
-.sortable th, .revealButton 
-	cursor: pointer !important /* override help-pointers from [title] and similar */
-
-.sortable th:hover 
-	box-shadow: 0 0 0 2px $white
 
 th.sorttable_sorted, th.sorttable_sorted_reverse
 	+linear-gradient($light-gray, $white-beige)
 
-.sortable th.sorttable_sorted:before  
-	content: "\25B4"
-	text-shadow: 0 0 2px $red
-	color: $black
+.sortable th, .revealButton
+	cursor: pointer !important /* override help-pointers from [title] and similar */
 
-.sortable th:not(sorttable_sorted):before  
-	content: "\25B5"
-	text-shadow: 0 0 2px $white
-	color: $dark-gray
+.sortable th
+	&:hover
+		box-shadow: 0 0 0 2px $white
 
-.sortable th.sorttable_sorted_reverse:after  
-	content: "\25BE"
-	text-shadow: 0 0 2px $red
-	color: $black
+	&.sorttable_sorted:before
+		content: "\25B4"
+		text-shadow: 0 0 2px $red
+		color: $black
 
-.sortable th:not(sorttable_sorted_reverse):after  
-	content: "\25BF"
-	text-shadow: 0 0 2px $white
-	color: $dark-gray
+	&:not(sorttable_sorted):before
+		content: "\25B5"
+		text-shadow: 0 0 2px $white
+		color: $dark-gray
+
+	&.sorttable_sorted_reverse:after
+		content: "\25BE"
+		text-shadow: 0 0 2px $red
+		color: $black
+
+	&:not(sorttable_sorted_reverse):after
+		content: "\25BF"
+		text-shadow: 0 0 2px $white
+		color: $dark-gray
 
 
 /* Hide middle part of table */
-//.minimize tr:nth-child(5) ~ tr 
+//.minimize tr:nth-child(5) ~ tr
 //	display: none
 //
-//.minimize tr:nth-child(5) td 
+//.minimize tr:nth-child(5) td
 //	display: none
 //
-//.minimize tr:nth-child(5):before 
+//.minimize tr:nth-child(5):before
 //	content: "..."
 //	display: block
 //
-//.minimize tr:nth-last-child(5) ~ tr 
+//.minimize tr:nth-last-child(5) ~ tr
 //	display: table-row !important
 //
-//.minimize tr:nth-last-child(5) ~ tr td 
+//.minimize tr:nth-last-child(5) ~ tr td
 //	display: table-cell !important
 //
-//.minimize tr:nth-last-child(5) ~ tr:before 
+//.minimize tr:nth-last-child(5) ~ tr:before
 //	display: none !important
 
 
-th:first-child, td:first-child 
+th:first-child, td:first-child
 	max-width: 12ex
 
-th 
+th
 	font-size: 120%
 	background-color: $lighter-gray
 	color: $black
 
-th:first-child 
-	border-radius: 8px 0 0 0
+th:first-child
+	border-radius-top-left: 8px
 
-th:last-child 
-	border-radius: 0 8px 0 0
+th:last-child
+	border-radius-top-right: 8px
 
-th>div 
+th>div
 	color: inherit
 	background-color: transparent
 
-.rotated 
+.rotated
 	width: 1.25em
 	line-height: 1
 	transform: rotate(90deg)
 	margin: 0 0 2.5ex calc(50% - 0.625em)
 
-td:nth-child(2n) 
+td:nth-child(2n)
 	background-color: $dark-teal
 
-td:nth-child(2n+1) 
+td:nth-child(2n+1)
 	background-color: $black
 
-.statNumber 
+.statNumber
 	text-align: right
 	font-size: 80%
 
-.statNumber::first-letter 
+.statNumber::first-letter
 	font-size: 125%
 
-.statName 
+.statName
 	//position: relative
 	overflow: hidden
 	white-space: nowrap
@@ -221,7 +219,7 @@ td:nth-child(2n+1)
 //td:first-child:hover 
 //	overflow: visible
 
-.statName span 
+.statName span
 	background-color: inherit
 
 /* position: relative needed for some reason to stop mouseoveroverflow from being semi-transparent.
@@ -230,34 +228,34 @@ td:nth-child(2n+1)
 //	z-index: 1
 
 /* Highlight row on mouseover */
-tbody>tr:hover 
+tbody>tr:hover
 	outline: solid white 1px
 
 
 /* INPUTS */
-input, select, button 
+input, select, button
 	border-color: $gray
 
-input:hover, select:hover, button:hover 
+input:hover, select:hover, button:hover
 	border-color: $white
 
-input:focus, select:focus, button:focus 
+input:focus, select:focus, button:focus
 	background-color: $white
 	color: $black
 
 
 /* MOUSEOVERS */
-.mouseover, [title] 
+.mouseover, [title]
 	cursor: help
 
-.mouseover 
+.mouseover
 	padding: 0.5em
 	border: dashed 1px $white
 
-.mouseover>.more 
+.mouseover>.more
 	cursor: auto
 
-.more 
+.more
 	visibility: hidden
 	display: inline-block
 	position: absolute
@@ -266,5 +264,5 @@ input:focus, select:focus, button:focus
 	border: dashed 1px $white
 	max-width: 60em
 
-:hover>.more 
+:hover>.more
 	visibility: visible
