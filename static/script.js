@@ -668,16 +668,14 @@ form.onsubmit = function() {
 			// Grey lines for remakes
 			if (r > 0) svgCode += "<line x1="+i*10+" x2="+i*10+" y1="+(maxGames*10-0.5)+" y2="+(maxGames*10-r*10)+" stroke-width=6 stroke=#888 stroke-dasharray='9, 1' />"
 			// 0m, 10m, 20m, ... timestamps and 3m /remake marker
-			if (i == 3 || (i%10 == 0 && i+2 < maxTime))
+			if (i == 3 || i == 15 || (i%10 == 0 && i+2 < maxTime))
 				svgCode += "<text x="+i*10+" y="+(maxGames*10+5)+" fill=#888 text-anchor=middle dominant-baseline=hanging>"+i+"m</text>"
 		}
 		
-		//3m line
-		svgCode += "<line x1="+3*10+" x2="+3*10+" y1="+(maxGames-0.5)*10+" y2=5 stroke=#444 stroke-dasharray='40, 10' />"
-		//15m line
-		svgCode += "<line x1="+15*10+" x2="+15*10+" y1="+(maxGames-0.5)*10+" y2=5 stroke=#444 stroke-dasharray='40, 10' />"
-		//20m line
-		svgCode += "<line x1="+20*10+" x2="+20*10+" y1="+(maxGames-0.5)*10+" y2=5 stroke=#444 stroke-dasharray='40, 10' />"
+		// 3m, 15m, 20m lines
+		for (let i of [3, 15, 20]) {
+			svgCode += "<line x1="+i*10+" x2="+i*10+" y1="+(maxGames-0.5)*10+" y2=5 stroke=#444 stroke-dasharray='40, 10' />"
+		}
 
 		// TODO: Add back mouseover text to numbers, use visibility: hidden/visible for improved performance
 		
