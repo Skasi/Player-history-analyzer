@@ -674,6 +674,8 @@ form.onsubmit = function() {
 		
 		//3m line
 		svgCode += "<line x1="+3*10+" x2="+3*10+" y1="+(maxGames-0.5)*10+" y2=5 stroke=#444 stroke-dasharray='40, 10' />"
+		//15m line
+		svgCode += "<line x1="+15*10+" x2="+15*10+" y1="+(maxGames-0.5)*10+" y2=5 stroke=#444 stroke-dasharray='40, 10' />"
 		//20m line
 		svgCode += "<line x1="+20*10+" x2="+20*10+" y1="+(maxGames-0.5)*10+" y2=5 stroke=#444 stroke-dasharray='40, 10' />"
 
